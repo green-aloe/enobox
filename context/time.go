@@ -22,3 +22,41 @@ func NewTime() Time {
 		Sample: 1,
 	}
 }
+
+// ShiftBy shifts the timestamp by the number of samples and returns the new timestamp. This does
+// not modify the receiver. The number of samples can be positive or negative.
+func (t Time) ShiftBy(samples int) Time {
+	t.Second += samples / SampleRate()
+	t.Sample += samples % SampleRate()
+
+	switch {
+	case t.Sample > SampleRate():
+		// We're overflowing the second. Bump up to the next second.
+		t.Second++
+		t.Sample -= SampleRate()
+
+	case t.Sample <= 0:
+		// We're underflowing the second. Bump down to the previous second.
+		t.Second--
+		t.Sample += SampleRate()
+	}
+
+	// If we went below 0 seconds, then reset the timestamp.
+	if t.Second < 0 {
+		t = NewTime()
+	}
+
+	return t
+}
+
+// Increment increments the timestamp by one sample and returns the new timestamp.
+// This does not modify the receiver. This is an alias for t.ShiftBy(1).
+func (t Time) Increment() Time {
+	return t.ShiftBy(1)
+}
+
+// Decrement decrements the timestamp by one sample and returns the new timestamp. This does not
+// modify the receiver. The timestamp can never go below 0. This is an alias for t.ShiftBy(-1).
+func (t Time) Decrement() Time {
+	return t.ShiftBy(-1)
+}
