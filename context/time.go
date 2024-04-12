@@ -1,5 +1,9 @@
 package context
 
+import (
+	"time"
+)
+
 // Time is a timestamp of a single sample of audio data.
 type Time struct {
 	// Second is the number of complete seconds that have elapsed so far.
@@ -59,4 +63,19 @@ func (t Time) Increment() Time {
 // modify the receiver. The timestamp can never go below 0. This is an alias for t.ShiftBy(-1).
 func (t Time) Decrement() Time {
 	return t.ShiftBy(-1)
+}
+
+// Duration calculates the duration between two timestamps to the nearest microsecond.
+func (t Time) Duration(t2 Time) time.Duration {
+	secondsDiff := t.Second - t2.Second
+	secondsDur := time.Duration(secondsDiff) * time.Second
+
+	samplesDiff := t.Sample - t2.Sample
+	samplesConv := float64(samplesDiff) / float64(SampleRate())
+	samplesDur := time.Duration(samplesConv * float64(time.Second))
+
+	diff := (secondsDur + samplesDur).Abs()
+	rounded := diff.Round(time.Microsecond)
+
+	return rounded
 }

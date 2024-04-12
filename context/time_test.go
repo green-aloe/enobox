@@ -140,3 +140,35 @@ func Test_Decrement(t *testing.T) {
 		require.Equal(t, 5, time2.Sample)
 	})
 }
+
+// Test_Duration tests that Time's Duration method calculates the correct duration between two
+// timestamps.
+func Test_Duration(t *testing.T) {
+	type subtest struct {
+		t1   Time
+		t2   Time
+		want string
+		name string
+	}
+
+	subtests := []subtest{
+		{NewTime(), NewTime(), "0s", "empty to empty"},
+		{Time{0, 1}, Time{0, 2}, "23µs", "one sample"},
+		{Time{0, 1}, Time{0, 3}, "45µs", "two samples"},
+		{Time{0, 1}, Time{0, 11}, "227µs", "ten samples"},
+		{Time{0, SampleRate()}, Time{1, 1}, "23µs", "seconds boundary"},
+		{Time{0, SampleRate()/2 + 1}, NewTime(), "500ms", "half second"},
+		{Time{1, 1}, NewTime(), "1s", "one second"},
+		{Time{2, 1}, NewTime(), "2s", "two seconds"},
+		{Time{100, 1}, Time{50, 1}, "50s", "fifty seconds"},
+		{Time{1, 1}, Time{0, 10_000}, "773.265ms", "10k samples"},
+		{Time{22, SampleRate()}, Time{23, SampleRate()}, "1s", "one second boundary"},
+	}
+
+	for _, subtest := range subtests {
+		t.Run(subtest.name, func(t *testing.T) {
+			require.Equal(t, subtest.want, subtest.t1.Duration(subtest.t2).String())
+			require.Equal(t, subtest.want, subtest.t2.Duration(subtest.t1).String())
+		})
+	}
+}
