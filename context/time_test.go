@@ -163,6 +163,8 @@ func Test_Duration(t *testing.T) {
 		{Time{100, 1}, Time{50, 1}, "50s", "fifty seconds"},
 		{Time{1, 1}, Time{0, 10_000}, "773.265ms", "10k samples"},
 		{Time{22, SampleRate()}, Time{23, SampleRate()}, "1s", "one second boundary"},
+		{NewTime(), Time{10_000, 1}, "2h46m40s", "hours"},
+		{NewTime(), Time{10_000, 10_000}, "2h46m40.226735s", "hours and seconds"},
 	}
 
 	for _, subtest := range subtests {
