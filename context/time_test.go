@@ -174,3 +174,157 @@ func Test_Duration(t *testing.T) {
 		})
 	}
 }
+
+// Test_Equal tests that Time's Equal method correctly determines when two timestamps are equal.
+func Test_Equal(t *testing.T) {
+	t.Run("empty", func(t *testing.T) {
+		time1 := NewTime()
+		time2 := NewTime()
+		require.True(t, time1.Equal(time2))
+		require.True(t, time2.Equal(time1))
+	})
+
+	t.Run("non-empty", func(t *testing.T) {
+		time1 := Time{111, 2222}
+		time2 := Time{111, 2222}
+		require.True(t, time1.Equal(time2))
+		require.True(t, time2.Equal(time1))
+	})
+
+	t.Run("different seconds", func(t *testing.T) {
+		time1 := Time{1, 1}
+		time2 := Time{2, 1}
+		require.False(t, time1.Equal(time2))
+		require.False(t, time2.Equal(time1))
+	})
+
+	t.Run("different samples", func(t *testing.T) {
+		time1 := Time{1, 10}
+		time2 := Time{1, 11}
+		require.False(t, time1.Equal(time2))
+		require.False(t, time2.Equal(time1))
+	})
+
+	t.Run("different seconds and samples", func(t *testing.T) {
+		time1 := Time{10, 88}
+		time2 := Time{200, 999}
+		require.False(t, time1.Equal(time2))
+		require.False(t, time2.Equal(time1))
+	})
+
+	t.Run("shifted", func(t *testing.T) {
+		time1 := NewTime()
+		time2 := NewTime()
+		require.True(t, time1.Equal(time2))
+		require.True(t, time2.Equal(time1))
+
+		time1 = time1.ShiftBy(20)
+		require.False(t, time1.Equal(time2))
+		require.False(t, time2.Equal(time1))
+
+		time2 = time2.ShiftBy(20)
+		require.True(t, time1.Equal(time2))
+		require.True(t, time2.Equal(time1))
+
+		time1 = time1.Decrement()
+		require.False(t, time1.Equal(time2))
+		require.False(t, time2.Equal(time1))
+
+		time2 = time2.Decrement()
+		require.True(t, time1.Equal(time2))
+		require.True(t, time2.Equal(time1))
+
+		time1 = time1.Increment().Increment()
+		require.False(t, time1.Equal(time2))
+		require.False(t, time2.Equal(time1))
+
+		time2 = time2.Increment().Increment()
+		require.True(t, time1.Equal(time2))
+		require.True(t, time2.Equal(time1))
+	})
+}
+
+// Test_Before tests that Time's Before method correctly determines when one timestamp is earlier
+// than another one.
+func Test_Before(t *testing.T) {
+	type subtest struct {
+		time1 Time
+		time2 Time
+		want  bool
+		name  string
+	}
+
+	subtests := []subtest{
+		{NewTime(), NewTime(), false, "equal empty"},
+		{Time{1, 1}, Time{1, 1}, false, "equal set"},
+		{NewTime(), Time{1, 1}, true, "empty to set"},
+		{Time{1, 1}, NewTime(), false, "set to empty"},
+		{Time{1, 1}, Time{1, 2}, true, "lower sample"},
+		{Time{1, 2}, Time{1, 1}, false, "higher sample"},
+		{Time{1, 2}, Time{2, 1}, true, "lower second"},
+		{Time{2, 1}, Time{1, 2}, false, "higher second"},
+		{Time{1, 1}, Time{2, 2}, true, "lower second, lower sample"},
+		{Time{2, 2}, Time{1, 1}, false, "higher second, higher sample"},
+		{Time{1, SampleRate()}, Time{2, 1}, true, "seconds boundary"},
+	}
+
+	for _, subtest := range subtests {
+		t.Run(subtest.name, func(t *testing.T) {
+			require.Equal(t, subtest.want, subtest.time1.Before(subtest.time2))
+		})
+	}
+}
+
+// Test_After tests that Time's After method correctly determines when one timestamp is later than
+// another one.
+func Test_After(t *testing.T) {
+	type subtest struct {
+		time1 Time
+		time2 Time
+		want  bool
+		name  string
+	}
+
+	subtests := []subtest{
+		{NewTime(), NewTime(), false, "equal empty"},
+		{Time{1, 1}, Time{1, 1}, false, "equal set"},
+		{NewTime(), Time{1, 1}, false, "empty to set"},
+		{Time{1, 1}, NewTime(), true, "set to empty"},
+		{Time{1, 1}, Time{1, 2}, false, "lower sample"},
+		{Time{1, 2}, Time{1, 1}, true, "higher sample"},
+		{Time{1, 2}, Time{2, 1}, false, "lower second"},
+		{Time{2, 1}, Time{1, 2}, true, "higher second"},
+		{Time{1, 1}, Time{2, 2}, false, "lower second, lower sample"},
+		{Time{2, 2}, Time{1, 1}, true, "higher second, higher sample"},
+		{Time{1, SampleRate()}, Time{2, 1}, false, "seconds boundary"},
+	}
+
+	for _, subtest := range subtests {
+		t.Run(subtest.name, func(t *testing.T) {
+			require.Equal(t, subtest.want, subtest.time1.After(subtest.time2))
+		})
+	}
+}
+
+// Test_String tests that Time's String method returns the correct string representation of the
+// timestamp.
+func Test_String(t *testing.T) {
+	type subtest struct {
+		time Time
+		want string
+	}
+
+	subtests := []subtest{
+		{NewTime(), "0 seconds, sample 1/44100"},
+		{Time{0, 2}, "0 seconds, sample 2/44100"},
+		{Time{1, 1}, "1 second, sample 1/44100"},
+		{Time{100, 100}, "100 seconds, sample 100/44100"},
+		{Time{10_000, SampleRate()}, "10000 seconds, sample 44100/44100"},
+	}
+
+	for _, subtest := range subtests {
+		t.Run(subtest.want, func(t *testing.T) {
+			require.Equal(t, subtest.want, subtest.time.String())
+		})
+	}
+}
