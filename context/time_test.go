@@ -17,6 +17,54 @@ func Test_NewTime(t *testing.T) {
 	require.Equal(t, 1, time.sample)
 }
 
+// Test_Second tests that Time's Second method returns the correct number of complete seconds that
+// have elapsed so far.
+func Test_Second(t *testing.T) {
+	type subtest struct {
+		time Time
+		want int
+		name string
+	}
+
+	subtests := []subtest{
+		{NewTime(), 0, "empty"},
+		{Time{100, 0}, 100, "seconds without samples"},
+		{Time{0, 100}, 0, "samples without seconds"},
+		{Time{50, 100}, 50, "seconds and samples"},
+	}
+
+	for _, subtest := range subtests {
+		t.Run(subtest.name, func(t *testing.T) {
+			require.Equal(t, subtest.want, subtest.time.second)
+			require.Equal(t, subtest.want, subtest.time.Second())
+		})
+	}
+}
+
+// Test_Sample tests that Time's Sample method returns the correct sample number in the current
+// second.
+func Test_Sample(t *testing.T) {
+	type subtest struct {
+		time Time
+		want int
+		name string
+	}
+
+	subtests := []subtest{
+		{NewTime(), 1, "empty"},
+		{Time{1, 100}, 100, "samples without seconds"},
+		{Time{100, 1}, 1, "seconds without samples"},
+		{Time{50, 70}, 70, "samples and seconds"},
+	}
+
+	for _, subtest := range subtests {
+		t.Run(subtest.name, func(t *testing.T) {
+			require.Equal(t, subtest.want, subtest.time.sample)
+			require.Equal(t, subtest.want, subtest.time.Sample())
+		})
+	}
+}
+
 // Test_ShiftBy tests that Time's ShiftBy method shifts the timestamp by the correct number of
 // samples.
 func Test_ShiftBy(t *testing.T) {
