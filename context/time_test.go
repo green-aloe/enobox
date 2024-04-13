@@ -11,10 +11,10 @@ import (
 func Test_NewTime(t *testing.T) {
 	time := NewTime()
 	require.IsType(t, Time{}, time)
-	require.IsType(t, int(0), time.Second)
-	require.IsType(t, int(0), time.Sample)
-	require.Equal(t, 0, time.Second)
-	require.Equal(t, 1, time.Sample)
+	require.IsType(t, int(0), time.second)
+	require.IsType(t, int(0), time.sample)
+	require.Equal(t, 0, time.second)
+	require.Equal(t, 1, time.sample)
 }
 
 // Test_ShiftBy tests that Time's ShiftBy method shifts the timestamp by the correct number of
@@ -66,8 +66,8 @@ func Test_ShiftBy(t *testing.T) {
 		time1 := NewTime()
 		time2 := time1.ShiftBy(5)
 		require.NotEqual(t, time1, time2)
-		require.Equal(t, 1, time1.Sample)
-		require.Equal(t, 6, time2.Sample)
+		require.Equal(t, 1, time1.Sample())
+		require.Equal(t, 6, time2.Sample())
 	})
 }
 
@@ -77,27 +77,27 @@ func Test_Increment(t *testing.T) {
 
 	t.Run("increment", func(t *testing.T) {
 		time := NewTime()
-		require.Equal(t, 1, time.Sample)
+		require.Equal(t, 1, time.Sample())
 		time = time.Increment()
-		require.Equal(t, 2, time.Sample)
+		require.Equal(t, 2, time.Sample())
 	})
 
 	t.Run("seconds boundary", func(t *testing.T) {
 		time := NewTime().ShiftBy(SampleRate() - 1)
-		require.Equal(t, 0, time.Second)
-		require.Equal(t, SampleRate(), time.Sample)
+		require.Equal(t, 0, time.Second())
+		require.Equal(t, SampleRate(), time.Sample())
 
 		time = time.Increment()
-		require.Equal(t, 1, time.Second)
-		require.Equal(t, 1, time.Sample)
+		require.Equal(t, 1, time.Second())
+		require.Equal(t, 1, time.Sample())
 	})
 
 	t.Run("immutable", func(t *testing.T) {
 		time1 := NewTime()
 		time2 := time1.Increment()
 		require.NotEqual(t, time1, time2)
-		require.Equal(t, 1, time1.Sample)
-		require.Equal(t, 2, time2.Sample)
+		require.Equal(t, 1, time1.Sample())
+		require.Equal(t, 2, time2.Sample())
 	})
 }
 
@@ -107,37 +107,37 @@ func Test_Decrement(t *testing.T) {
 
 	t.Run("increment", func(t *testing.T) {
 		time := NewTime().ShiftBy(5)
-		require.Equal(t, 6, time.Sample)
+		require.Equal(t, 6, time.Sample())
 		time = time.Decrement()
-		require.Equal(t, 5, time.Sample)
+		require.Equal(t, 5, time.Sample())
 	})
 
 	t.Run("seconds boundary", func(t *testing.T) {
 		time := NewTime().ShiftBy(SampleRate())
-		require.Equal(t, 1, time.Second)
-		require.Equal(t, 1, time.Sample)
+		require.Equal(t, 1, time.Second())
+		require.Equal(t, 1, time.Sample())
 
 		time = time.Decrement()
-		require.Equal(t, 0, time.Second)
-		require.Equal(t, SampleRate(), time.Sample)
+		require.Equal(t, 0, time.Second())
+		require.Equal(t, SampleRate(), time.Sample())
 	})
 
 	t.Run("minimum", func(t *testing.T) {
 		time := NewTime()
-		require.Equal(t, 0, time.Second)
-		require.Equal(t, 1, time.Sample)
+		require.Equal(t, 0, time.Second())
+		require.Equal(t, 1, time.Sample())
 
 		time = time.Decrement()
-		require.Equal(t, 0, time.Second)
-		require.Equal(t, 1, time.Sample)
+		require.Equal(t, 0, time.Second())
+		require.Equal(t, 1, time.Sample())
 	})
 
 	t.Run("immutable", func(t *testing.T) {
 		time1 := NewTime().ShiftBy(5)
 		time2 := time1.Decrement()
 		require.NotEqual(t, time1, time2)
-		require.Equal(t, 6, time1.Sample)
-		require.Equal(t, 5, time2.Sample)
+		require.Equal(t, 6, time1.Sample())
+		require.Equal(t, 5, time2.Sample())
 	})
 }
 
