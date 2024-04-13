@@ -1,6 +1,7 @@
 package context
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -78,4 +79,36 @@ func (t Time) Duration(t2 Time) time.Duration {
 	rounded := diff.Round(time.Microsecond)
 
 	return rounded
+}
+
+// Equal returns true if the two timestamps are equal.
+func (t Time) Equal(t2 Time) bool {
+	return t == t2
+}
+
+// Before returns true if t represents a time that is earlier/lower than t2 does.
+func (t Time) Before(t2 Time) bool {
+	if t.Second != t2.Second {
+		return t.Second < t2.Second
+	}
+
+	return t.Sample < t2.Sample
+}
+
+// After returns true if t represents a time that is later/higher than t2 does.
+func (t Time) After(t2 Time) bool {
+	if t.Second != t2.Second {
+		return t.Second > t2.Second
+	}
+
+	return t.Sample > t2.Sample
+}
+
+// String returns the human-readable representation of t.
+func (t Time) String() string {
+	suffix := "s"
+	if t.Second == 1 {
+		suffix = ""
+	}
+	return fmt.Sprintf("%v second%s, sample %v/%v", t.Second, suffix, t.Sample, SampleRate())
 }
