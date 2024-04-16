@@ -28,8 +28,17 @@ type Tone struct {
 	HarmonicGains []float32
 }
 
+// NewTone initializes a tone with default/zero values.
 func NewTone() Tone {
 	return Tone{
 		HarmonicGains: make([]float32, NumHarmGains),
 	}
+}
+
+// NewToneAt initializes a tone with the specified fundamental frequency.
+func NewToneAt(frequency float32) Tone {
+	tone := NewTone()
+	tone.Frequency = frequency
+
+	return tone
 }
