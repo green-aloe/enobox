@@ -9,6 +9,7 @@ import (
 // Test_Consts tests any package-level constant values.
 func Test_Consts(t *testing.T) {
 	require.Equal(t, 20, NumHarmGains)
+	require.Equal(t, 6, MaxSigFigs)
 }
 
 // Test_NewTone tests that NewTone returns a Tone that has been initialized correctly.
