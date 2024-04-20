@@ -1,7 +1,6 @@
 package tone
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 
@@ -81,10 +80,7 @@ func Trunc(f float32, n int) float32 {
 			decPlaces := n - numLeft
 			d = d.Trunc(decPlaces)
 
-			f64, ok := d.Float64()
-			if !ok {
-				panic(fmt.Sprintf("Unable to convert '%v' to float64", d))
-			}
+			f64, _ := d.Float64()
 			f = float32(f64)
 		}
 	}
