@@ -116,3 +116,16 @@ func Trunc(f float32, n int) float32 {
 
 	return f
 }
+
+// Clone returns a complete copy of the tone that has all of the same values as the original but
+// does not share any memory with it.
+func (tone Tone) Clone() Tone {
+	// Copy over all the basic fields.
+	c := tone
+
+	// Copy over the extended fields.
+	c.HarmonicGains = make([]float32, len(tone.HarmonicGains))
+	copy(c.HarmonicGains, tone.HarmonicGains)
+
+	return c
+}

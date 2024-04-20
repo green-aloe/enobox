@@ -228,3 +228,45 @@ func Test_Trunc(t *testing.T) {
 		})
 	}
 }
+
+// Test_Tone_Clone tests that Tone's Clone method creates a deep copy of the tone that has all of
+// the same values as the original but does not share any memory with it.
+func Test_Tone_Clone(t *testing.T) {
+	type subtest struct {
+		tone Tone
+		name string
+	}
+
+	subtests := []subtest{
+		{NewTone(), "empty"},
+		{NewToneAt(42), "frequency only"},
+		{Tone{0, 0, []float32{}}, "empty, no harmonics"},
+		{Tone{1, 1, []float32{}}, "frequency and gain only"},
+		{Tone{0, 0, []float32{.41, 103.3}}, "harmonics only"},
+		{Tone{1.1, 2.2, []float32{0, 1.1, 0.03}}, "all fields"},
+	}
+
+	for _, subtest := range subtests {
+		t.Run(subtest.name, func(t *testing.T) {
+			clone := subtest.tone.Clone()
+
+			// Make sure all fields have the same values.
+			require.Equal(t, subtest.tone.Frequency, clone.Frequency)
+			require.Equal(t, subtest.tone.Gain, clone.Gain)
+			require.Equal(t, len(subtest.tone.HarmonicGains), len(clone.HarmonicGains))
+			for i := range subtest.tone.HarmonicGains {
+				require.Equal(t, subtest.tone.HarmonicGains[i], clone.HarmonicGains[i])
+			}
+
+			// Make sure no fields share memory.
+			subtest.tone.Frequency++
+			require.NotEqual(t, subtest.tone.Frequency, clone.Frequency)
+			subtest.tone.Gain++
+			require.NotEqual(t, subtest.tone.Gain, clone.Gain)
+			for i := range subtest.tone.HarmonicGains {
+				subtest.tone.HarmonicGains[i]++
+				require.NotEqual(t, subtest.tone.HarmonicGains[i], clone.HarmonicGains[i])
+			}
+		})
+	}
+}
