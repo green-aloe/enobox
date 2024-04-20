@@ -67,9 +67,12 @@ func Test_Tone_HarmonicFreq(t *testing.T) {
 	}
 
 	subtests := []subtest{
-		{NewTone(), 0, 0, "empty tone, no harmonic"},
-		{NewTone(), -1, 0, "empty tone, negative harmonic"},
-		{NewTone(), 1, 0, "empty tone, positive harmonic"},
+		{Tone{}, 0, 0, "empty tone, no harmonic"},
+		{Tone{}, -1, 0, "empty tone, negative harmonic"},
+		{Tone{}, 1, 0, "empty tone, positive harmonic"},
+		{NewTone(), 0, 0, "new tone, no harmonic"},
+		{NewTone(), -1, 0, "new tone, negative harmonic"},
+		{NewTone(), 1, 0, "new tone, positive harmonic"},
 		{NewToneAt(0), 0, 0, "zero frequency, no harmonic"},
 		{NewToneAt(0), -10, 0, "zero frequency, negative harmonic"},
 		{NewToneAt(0), 10, 0, "zero frequency, positive harmonic"},
@@ -137,7 +140,8 @@ func Test_Tone_Clone(t *testing.T) {
 	}
 
 	subtests := []subtest{
-		{NewTone(), "empty"},
+		{Tone{}, "empty"},
+		{NewTone(), "new"},
 		{NewToneAt(42), "frequency only"},
 		{Tone{0, 0, []float32{}}, "empty, no harmonics"},
 		{Tone{1, 1, []float32{}}, "frequency and gain only"},
