@@ -10,6 +10,9 @@ import (
 const (
 	// Number of harmonic gains above the fundamental frequency that are tracked for each tone by default
 	NumHarmGains = 20
+
+	// MaxSigFigs is the maximum number of significant figures to use when rounding decimals
+	MaxSigFigs = 6
 )
 
 // A Tone represents a single tone, which is a fundamental frequency and its harmonics at regular
@@ -48,6 +51,32 @@ func NewToneAt(frequency float32) Tone {
 	tone.Frequency = frequency
 
 	return tone
+}
+
+// HarmonicFreq calculates the frequency of the tone's nth harmonic. The frequency is truncated to
+// have no more than MaxSigFigs significant figures.
+//
+// As an example, if the tone has a fundamental frequency of 440Hz, then the first harmonic (n=1) is
+// 880Hz and the second harmonic (n=2) is 1320Hz,
+func (tone Tone) HarmonicFreq(n int) float32 {
+	if n <= 0 || tone.Frequency == 0 {
+		return 0
+	}
+
+	freq := tone.Frequency
+	if freq < 0 {
+		freq = -freq
+		n--
+	} else {
+		n++
+	}
+
+	fundFreq, _ := decimal.NewFromFloat64(float64(freq))
+	multiplier, _ := decimal.New(int64(n), 0)
+	harmFreq, _ := fundFreq.Mul(multiplier)
+	f64, _ := harmFreq.Float64()
+
+	return Trunc(float32(f64), MaxSigFigs)
 }
 
 // Trunc truncates a  decimal to have no more than n digits.
