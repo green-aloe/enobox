@@ -51,26 +51,24 @@ func NewToneAt(frequency float32) Tone {
 	return tone
 }
 
-// HarmonicFreq calculates the frequency of the tone's nth harmonic. The frequency is truncated to
-// have no more than MaxSigFigs significant figures.
+// HarmonicFreq calculates the frequency of one of the tone's harmonic. The fundamental frequency
+// has an order of 1. The frequency is truncated to have no more than MaxSigFigs digits.
 //
-// As an example, if the tone has a fundamental frequency of 440Hz, then the first harmonic (n=1) is
-// 880Hz and the second harmonic (n=2) is 1320Hz,
-func (tone Tone) HarmonicFreq(n int) float32 {
-	if n <= 0 || tone.Frequency == 0 {
+// As an example, if the tone has a fundamental frequency of 440Hz, then the first harmonic (order=2) is
+// 880Hz and the second harmonic (order=3) is 1320Hz,
+func (tone Tone) HarmonicFreq(order int) float32 {
+	if order <= 0 || tone.Frequency == 0 {
 		return 0
 	}
 
 	freq := tone.Frequency
 	if freq < 0 {
 		freq = -freq
-		n--
-	} else {
-		n++
+		order -= 2
 	}
 
 	fundFreq, _ := decimal.NewFromFloat64(float64(freq))
-	multiplier, _ := decimal.New(int64(n), 0)
+	multiplier, _ := decimal.New(int64(order), 0)
 	harmFreq, _ := fundFreq.Mul(multiplier)
 	f64, _ := harmFreq.Float64()
 
