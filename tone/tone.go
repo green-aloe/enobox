@@ -27,8 +27,9 @@ type Tone struct {
 
 	// HarmonicGains is a list of gains for each harmonic above the fundamental frequency. They are
 	// ratios of the amplitude of the harmonic to the amplitude of the fundamental frequency. The
-	// first element is the gain of the first harmonic, the second element is the gain of the second
-	// harmonic, and so on.
+	// first element is the gain of the first harmonic (which has a frequency twice as high as the
+	// fundamental frequency), the second element is the gain of the second harmonic (three times as
+	// high), and so on.
 	//
 	// As an example, a value of 2 will double the amplitude of that harmonic relative to the
 	// fundamental frequency, while a value of 0.5 will halve it.
