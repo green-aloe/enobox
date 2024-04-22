@@ -184,3 +184,34 @@ func Test_Tone_Clone(t *testing.T) {
 		})
 	}
 }
+
+// Test_Tone_Empty tests that Tone's Empty method correctly determines whether a tone is empty.
+func Test_Tone_Empty(t *testing.T) {
+	type subtest struct {
+		want bool
+		tone Tone
+		name string
+	}
+
+	subtests := []subtest{
+		{true, Tone{}, "empty"},
+		{true, NewTone(), "new"},
+		{false, Tone{10, 0, nil}, "frequency only"},
+		{false, Tone{0, 10, nil}, "gain only"},
+		{false, Tone{0, 0, []float32{0.1, 0.2}}, "harmonics only"},
+		{false, Tone{10, 10, nil}, "frequency and gain"},
+		{false, Tone{10, 10, []float32{0.1, 0.2}}, "all fields"},
+		{false, Tone{10, 10, []float32{-20}}, "all fields, negative harmonic gain"},
+		{false, Tone{-20, 0, nil}, "negative frequency"},
+		{false, Tone{0, -20, nil}, "negative gain"},
+		{false, NewSquareTone(10), "square tone"},
+		{false, NewTriangleTone(20), "triangle tone"},
+		{false, NewSawtoothTone(30), "sawtooth tone"},
+	}
+
+	for _, subtest := range subtests {
+		t.Run(subtest.name, func(t *testing.T) {
+			require.Equal(t, subtest.want, subtest.tone.Empty())
+		})
+	}
+}

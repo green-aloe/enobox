@@ -87,3 +87,22 @@ func (tone Tone) Clone() Tone {
 
 	return c
 }
+
+// Empty checks whether the tone does not have any values set.
+func (tone Tone) Empty() bool {
+	if tone.Frequency != 0 {
+		return false
+	}
+
+	if tone.Gain != 0 {
+		return false
+	}
+
+	for _, harmGain := range tone.HarmonicGains {
+		if harmGain != 0 {
+			return false
+		}
+	}
+
+	return true
+}
