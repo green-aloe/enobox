@@ -8,7 +8,7 @@ const (
 	// Number of harmonic gains above the fundamental frequency that are tracked for each tone by default
 	NumHarmGains = 20
 
-	// MaxSigFigs is the maximum number of significant figures to use when rounding decimals
+	// Maximum number of significant figures to use when truncating decimals
 	MaxSigFigs = 6
 )
 
