@@ -59,3 +59,60 @@ var (
 		Trunc(1.0/97, MaxSigFigs), Trunc(1.0/98, MaxSigFigs), Trunc(1.0/99, MaxSigFigs), Trunc(1.0/100, MaxSigFigs), Trunc(1.0/101, MaxSigFigs),
 	}
 )
+
+// NewSquareTone creates a new tone that has a square waveform.
+//
+// In a square waveform, the even-ordered harmonics have no gain, while the odd-ordered harmonics
+// have gains that are the inverse of their orders. This waveform has a duty cycle of 50%, meaning
+// that is has equal high and low periods.
+//
+// For example, a square tone that has a fundamental frequency (order=1) of 100Hz and a gain of 1
+// has these first four harmonics:
+//   - Harmonic 1: order = 2, frequency = 200Hz, gain = 0
+//   - Harmonic 2: order = 3, frequency = 300Hz, gain = 1/3
+//   - Harmonic 3: order = 4, frequency = 400Hz, gain = 0
+//   - Harmonic 4: order = 5, frequency = 500Hz, gain = 1/5
+func NewSquareTone(frequency float32) Tone {
+	tone := NewToneAt(frequency)
+	copy(tone.HarmonicGains, squareHarmGains)
+
+	return tone
+}
+
+// NewTriangleTone creates a new tone that has a triangle waveform.
+//
+// In a triangle waveform, the even-ordered harmonics have no gain, while the odd-ordered harmonics
+// have gains that are the inverse square of their orders (which also makes this waveform an
+// integral of a square waveform). This leads to a much steeper roll-off than other waveforms.
+//
+// For example, a triangle tone that has a fundamental frequency (order=1) of 100Hz and a gain of 1
+// has these first four harmonics:
+//   - Harmonic 1: order = 2, frequency = 200Hz, gain = 0
+//   - Harmonic 2: order = 3, frequency = 300Hz, gain = 1/9
+//   - Harmonic 3: order = 4, frequency = 400Hz, gain = 0
+//   - Harmonic 4: order = 5, frequency = 500Hz, gain = 1/25
+func NewTriangleTone(frequency float32) Tone {
+	tone := NewToneAt(frequency)
+	copy(tone.HarmonicGains, triangleHarmGains)
+
+	return tone
+}
+
+// NewSawtoothTone creates a new tone that has a sawtooth waveform.
+//
+// In a sawtooth waveform, each harmonic has a gain that is the inverse of its order. Because it is
+// composed of every harmonic of the fundamental frequency, a sawtooth waveform is brighter and
+// richer than other waveforms.
+//
+// For example, a sawtooth tone that has a fundamental frequency (order=1) of 100Hz and a gain of 1
+// has these first four harmonics:
+//   - Harmonic 1: order = 2, frequency = 200Hz, gain = 1/2
+//   - Harmonic 2: order = 3, frequency = 300Hz, gain = 1/3
+//   - Harmonic 3: order = 4, frequency = 400Hz, gain = 1/4
+//   - Harmonic 4: order = 5, frequency = 500Hz, gain = 1/5
+func NewSawtoothTone(frequency float32) Tone {
+	tone := NewToneAt(frequency)
+	copy(tone.HarmonicGains, sawtoothHarmGains)
+
+	return tone
+}
