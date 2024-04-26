@@ -26,7 +26,12 @@ const (
 type Note string
 
 func NewToneFrom(note Note, octave int) Tone {
-	return NewToneAt(noteFreqs[note][octave])
+	freq := noteFreqs[note][octave]
+	if freq <= 0 {
+		return Tone{}
+	}
+
+	return NewToneAt(freq)
 }
 
 // Adapted from https://en.wikipedia.org/wiki/Scientific_pitch_notation
