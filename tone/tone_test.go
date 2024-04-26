@@ -12,7 +12,7 @@ func Test_Consts(t *testing.T) {
 	require.Equal(t, 6, MaxSigFigs)
 }
 
-// Test_NewTone tests that NewTone returns a Tone that has been initialized correctly.
+// Test_NewTone tests that NewTone returns a tone that has been initialized correctly.
 func Test_NewTone(t *testing.T) {
 	tone := NewTone()
 	require.NotEmpty(t, tone)
@@ -25,7 +25,7 @@ func Test_NewTone(t *testing.T) {
 	}
 }
 
-// Test_NewToneAt tests that NewToneAt returns a Tone that has been initialized with the correct
+// Test_NewToneAt tests that NewToneAt returns a tone that has been initialized with the correct
 // fundamental frequency.
 func Test_NewToneAt(t *testing.T) {
 	type subtest struct {
