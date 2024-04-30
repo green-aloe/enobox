@@ -1,6 +1,8 @@
 package context
 
 import (
+	"context"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,20 +12,35 @@ import (
 func Test_NewContext(t *testing.T) {
 	ctx := NewContext()
 	require.NotEmpty(t, ctx)
-	require.IsType(t, Context{}, ctx)
-	require.Equal(t, NewTime(), ctx.Time())
-	require.Equal(t, DefaultSampleRate, ctx.SampleRate())
+
+	t.Run("types", func(t *testing.T) {
+		require.IsType(t, Context{}, ctx)
+
+		rt := reflect.TypeOf(&ctx)
+		ri := reflect.TypeOf((*context.Context)(nil)).Elem()
+		require.True(t, rt.Implements(ri))
+	})
+
+	t.Run("initial values", func(t *testing.T) {
+		require.Equal(t, NewTime(), ctx.Time())
+		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
+	})
 }
 
 // Test_Context_Time tests that Context's Time method returns the correct timestamp.
 func Test_Context_Time(t *testing.T) {
 
-	t.Run("empty", func(t *testing.T) {
+	t.Run("nil pointer", func(t *testing.T) {
+		var ctx *Context
+		require.Equal(t, Time{}, ctx.Time())
+	})
+
+	t.Run("uninitialized", func(t *testing.T) {
 		var ctx Context
 		require.Equal(t, Time{}, ctx.Time())
 	})
 
-	t.Run("initial", func(t *testing.T) {
+	t.Run("initialized", func(t *testing.T) {
 		ctx := NewContext()
 		require.Equal(t, 0, ctx.Time().Second())
 		require.Equal(t, 1, ctx.Time().Sample())
@@ -31,7 +48,7 @@ func Test_Context_Time(t *testing.T) {
 
 	t.Run("updated", func(t *testing.T) {
 		ctx := NewContext()
-		ctx.time = ctx.time.ShiftBy(10)
+		ctx.Context = context.WithValue(ctx, contextKeyTime{}, ctx.Time().ShiftBy(10))
 		require.Equal(t, 0, ctx.Time().Second())
 		require.Equal(t, 11, ctx.Time().Sample())
 	})
@@ -52,20 +69,32 @@ func Test_Context_SampleRate(t *testing.T) {
 	require.Equal(t, 44_100, SampleRate())
 	defer SetSampleRate(DefaultSampleRate)
 
-	t.Run("empty", func(t *testing.T) {
+	t.Run("nil pointer", func(t *testing.T) {
+		var ctx *Context
+		require.Equal(t, 0, ctx.SampleRate())
+	})
+
+	t.Run("uninitialized", func(t *testing.T) {
 		var ctx Context
 		require.Equal(t, 0, ctx.SampleRate())
 	})
 
-	t.Run("initial", func(t *testing.T) {
+	t.Run("initialized", func(t *testing.T) {
 		ctx := NewContext()
 		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
 	})
 
 	t.Run("updated", func(t *testing.T) {
-		SetSampleRate(100)
 		ctx := NewContext()
-		require.Equal(t, 100, ctx.SampleRate())
+		ctx.Context = context.WithValue(ctx, contextKeySampleRate{}, ctx.SampleRate()+99)
+		require.Equal(t, 44199, ctx.SampleRate())
+	})
+
+	t.Run("immutable", func(t *testing.T) {
+		ctx := NewContext()
+		SetSampleRate(100)
+		require.Equal(t, 44100, ctx.SampleRate())
+		require.Equal(t, 100, SampleRate())
 	})
 }
 
@@ -75,19 +104,18 @@ func Test_Context_NyqistFrequency(t *testing.T) {
 	require.Equal(t, 44_100, SampleRate())
 	defer SetSampleRate(DefaultSampleRate)
 
-	t.Run("empty", func(t *testing.T) {
+	t.Run("nil pointer", func(t *testing.T) {
+		var ctx *Context
+		require.Equal(t, float32(0), ctx.NyqistFrequency())
+	})
+
+	t.Run("uninitialized", func(t *testing.T) {
 		var ctx Context
 		require.Equal(t, float32(0), ctx.NyqistFrequency())
 	})
 
-	t.Run("initial", func(t *testing.T) {
+	t.Run("initialized", func(t *testing.T) {
 		ctx := NewContext()
 		require.Equal(t, float32(22_050), ctx.NyqistFrequency())
-	})
-
-	t.Run("updated", func(t *testing.T) {
-		SetSampleRate(100)
-		ctx := NewContext()
-		require.Equal(t, float32(50), ctx.NyqistFrequency())
 	})
 }
