@@ -4,12 +4,14 @@ import (
 	"context"
 )
 
-const (
-	keyTime       ctxKey = "time"
-	keySampleRate ctxKey = "sampleRate"
+var (
+	contextKeyTime       contextKey
+	contextKeySampleRate contextKey
 )
 
-type ctxKey string
+// contextKey is a type used to create keys for storing values in a context. It's an empty struct to
+// avoid any allocations.
+type contextKey struct{}
 
 // Context holds the context for a single sample of audio.
 type Context struct {
@@ -21,15 +23,15 @@ func NewContext() Context {
 	ctx := context.Background()
 
 	// Initialize some default values.
-	ctx = context.WithValue(ctx, keyTime, NewTime())
-	ctx = context.WithValue(ctx, keySampleRate, SampleRate())
+	ctx = context.WithValue(ctx, contextKeyTime, NewTime())
+	ctx = context.WithValue(ctx, contextKeySampleRate, SampleRate())
 
 	return Context{
 		Context: ctx,
 	}
 }
 
-func value[T any](ctx *Context, key ctxKey) T {
+func value[T any](ctx *Context, key contextKey) T {
 	if ctx != nil && ctx.Context != nil {
 		if v := ctx.Value(key); v != nil {
 			if t, ok := v.(T); ok {
@@ -44,12 +46,12 @@ func value[T any](ctx *Context, key ctxKey) T {
 
 // Time returns the context's internal timestamp.
 func (ctx *Context) Time() Time {
-	return value[Time](ctx, keyTime)
+	return value[Time](ctx, contextKeyTime)
 }
 
 // SampleRate returns the sample rate for this context.
 func (ctx *Context) SampleRate() int {
-	return value[int](ctx, keySampleRate)
+	return value[int](ctx, contextKeySampleRate)
 }
 
 // NyqistFrequency returns the maximum frequency that should be used with this context's sample rate.
