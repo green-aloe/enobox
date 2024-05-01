@@ -29,7 +29,6 @@ func Test_NewContext(t *testing.T) {
 
 // Test_Context_Time tests that Context's Time method returns the correct timestamp.
 func Test_Context_Time(t *testing.T) {
-
 	t.Run("nil pointer", func(t *testing.T) {
 		var ctx *Context
 		require.Equal(t, Time{}, ctx.Time())
@@ -61,6 +60,29 @@ func Test_Context_Time(t *testing.T) {
 		require.Equal(t, 1, ctx.Time().Sample())
 		require.Equal(t, 10, time.Second())
 		require.Equal(t, 11, time.Sample())
+	})
+}
+
+// Test_Context_SetTime tests that Context's SetTime method sets the correct timestamp in the
+// context.
+func Test_Context_SetTime(t *testing.T) {
+	t.Run("nil pointer", func(t *testing.T) {
+		var ctx *Context
+		ctx.SetTime(Time{10, 20})
+		require.Equal(t, Time{}, ctx.Time())
+	})
+
+	t.Run("uninitialized", func(t *testing.T) {
+		var ctx Context
+		ctx.SetTime(Time{10, 20})
+		require.Equal(t, Time{}, ctx.Time())
+	})
+
+	t.Run("initialized", func(t *testing.T) {
+		ctx := NewContext()
+		ctx.SetTime(Time{10, 20})
+		require.Equal(t, 10, ctx.Time().Second())
+		require.Equal(t, 20, ctx.Time().Sample())
 	})
 }
 

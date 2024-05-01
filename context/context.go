@@ -47,6 +47,15 @@ func (ctx *Context) Time() Time {
 	return value[Time](ctx, contextKeyTime{})
 }
 
+// SetTime sets the context's internal timestamp.
+func (ctx *Context) SetTime(time Time) {
+	if ctx == nil || ctx.Context == nil {
+		return
+	}
+
+	ctx.Context = context.WithValue(ctx, contextKeyTime{}, time)
+}
+
 // SampleRate returns the sample rate for this context.
 func (ctx *Context) SampleRate() int {
 	return value[int](ctx, contextKeySampleRate{})
