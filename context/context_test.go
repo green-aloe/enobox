@@ -27,6 +27,42 @@ func Test_NewContext(t *testing.T) {
 	})
 }
 
+// Test_value tests that value returns the correct value from a context and handles missing values
+// and bad configurations correctly.
+func Test_value(t *testing.T) {
+	t.Run("nil pointer", func(t *testing.T) {
+		var ctx *Context
+		require.Equal(t, Time{}, value[Time](ctx, contextKeyTime{}))
+		require.Equal(t, 0, value[int](ctx, contextKeyTime{}))
+		require.Equal(t, "", value[string](ctx, contextKeyTime{}))
+	})
+
+	t.Run("uninitialized", func(t *testing.T) {
+		var ctx Context
+		require.Equal(t, false, value[bool](&ctx, contextKeySampleRate{}))
+		require.Equal(t, 0.0, value[float64](&ctx, contextKeySampleRate{}))
+		require.Equal(t, "", value[string](&ctx, contextKeySampleRate{}))
+	})
+
+	t.Run("initialized", func(t *testing.T) {
+		ctx := NewContext()
+		require.Equal(t, 0, value[Time](&ctx, contextKeyTime{}).Second())
+		require.Equal(t, 1, value[Time](&ctx, contextKeyTime{}).Sample())
+		require.Equal(t, DefaultSampleRate, value[int](&ctx, contextKeySampleRate{}))
+	})
+
+	t.Run("missing key", func(t *testing.T) {
+		ctx := NewContext()
+		require.Equal(t, 0, value[int](&ctx, contextKeyTest{}))
+	})
+
+	t.Run("wrong type", func(t *testing.T) {
+		ctx := NewContext()
+		require.Equal(t, 0, value[int](&ctx, contextKeyTime{}))
+		require.Equal(t, "", value[string](&ctx, contextKeySampleRate{}))
+	})
+}
+
 // Test_Context_Time tests that Context's Time method returns the correct timestamp.
 func Test_Context_Time(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {

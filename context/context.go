@@ -8,6 +8,7 @@ import (
 //
 // They're all empty structs to avoid any allocations. Because one empty struct is indistinguishable
 // from another, we have to use a different type for each key.
+type contextKeyTest struct{}
 type contextKeyTime struct{}
 type contextKeySampleRate struct{}
 
@@ -29,6 +30,8 @@ func NewContext() Context {
 	}
 }
 
+// value returns a hard-typed value from the context. If the value is not found, it returns the zero
+// value of the type.
 func value[T any](ctx *Context, key any) T {
 	if ctx != nil && ctx.Context != nil {
 		if v := ctx.Value(key); v != nil {
