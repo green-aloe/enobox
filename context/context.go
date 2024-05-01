@@ -61,6 +61,15 @@ func (ctx *Context) SampleRate() int {
 	return value[int](ctx, contextKeySampleRate{})
 }
 
+// SetSampleRate sets the sample rate for this context.
+func (ctx *Context) SetSampleRate(rate int) {
+	if ctx == nil || ctx.Context == nil {
+		return
+	}
+
+	ctx.Context = context.WithValue(ctx, contextKeySampleRate{}, rate)
+}
+
 // NyqistFrequency returns the maximum frequency that should be used with this context's sample rate.
 func (ctx *Context) NyqistFrequency() float32 {
 	return float32(ctx.SampleRate() / 2)

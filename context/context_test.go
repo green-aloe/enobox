@@ -120,6 +120,31 @@ func Test_Context_SampleRate(t *testing.T) {
 	})
 }
 
+// Test_Context_SetSampleRate tests that Context's SetSampleRate method sets the correct sample rate
+// in the context.
+func Test_Context_SetSampleRate(t *testing.T) {
+	require.Equal(t, 44_100, SampleRate())
+	defer SetSampleRate(DefaultSampleRate)
+
+	t.Run("nil pointer", func(t *testing.T) {
+		var ctx *Context
+		ctx.SetSampleRate(10)
+		require.Equal(t, 0, ctx.SampleRate())
+	})
+
+	t.Run("uninitialized", func(t *testing.T) {
+		var ctx Context
+		ctx.SetSampleRate(10)
+		require.Equal(t, 0, ctx.SampleRate())
+	})
+
+	t.Run("initialized", func(t *testing.T) {
+		ctx := NewContext()
+		ctx.SetSampleRate(10)
+		require.Equal(t, 10, ctx.SampleRate())
+	})
+}
+
 // Test_Context_NyqistFrequency tests that Context's NyqistFrequency method returns the correct
 // frequency.
 func Test_Context_NyqistFrequency(t *testing.T) {
