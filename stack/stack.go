@@ -3,7 +3,8 @@ package stack
 import "sync"
 
 // A stack is a first-in-last-out (FILO) data structure: the last element pushed is the first
-// element popped.
+// element popped. The zero value is an empty stack and ready to use, and stacks are safe for
+// concurrent use.
 type Stack struct {
 	top   *node
 	mutex sync.Mutex
