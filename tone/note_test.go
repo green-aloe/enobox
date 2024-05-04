@@ -62,18 +62,18 @@ func Test_NewToneFrom(t *testing.T) {
 
 	t.Run("invalid note", func(t *testing.T) {
 		tone := NewToneFrom(Note("H"), 5)
-		require.Empty(t, tone)
+		require.Zero(t, tone)
 
 		tone = NewToneFrom(Note(C+"b"), 5)
-		require.Empty(t, tone)
+		require.Zero(t, tone)
 	})
 
 	t.Run("invalid octave", func(t *testing.T) {
 		tone := NewToneFrom(C, -2)
-		require.Empty(t, tone)
+		require.Zero(t, tone)
 
 		tone = NewToneFrom(C, 11)
-		require.Empty(t, tone)
+		require.Zero(t, tone)
 	})
 
 	for _, note := range []Note{C, CSharp, DFlat, D, DSharp, EFlat, E, F, FSharp, GFlat, G, GSharp, AFlat, A, ASharp, BFlat, B} {
@@ -84,7 +84,7 @@ func Test_NewToneFrom(t *testing.T) {
 				require.IsType(t, Tone{}, tone)
 				require.Greater(t, tone.Frequency, float32(8))
 				require.Equal(t, noteFreqs[note][octave], tone.Frequency)
-				require.Equal(t, float32(0), tone.Gain)
+				require.Zero(t, tone.Gain)
 				require.Len(t, tone.HarmonicGains, NumHarmGains)
 				for _, gain := range tone.HarmonicGains {
 					require.Equal(t, float32(0), gain)

@@ -17,11 +17,11 @@ func Test_NewTone(t *testing.T) {
 	tone := NewTone()
 	require.NotEmpty(t, tone)
 	require.IsType(t, Tone{}, tone)
-	require.Equal(t, float32(0), tone.Frequency)
-	require.Equal(t, float32(0), tone.Gain)
+	require.Zero(t, tone.Frequency)
+	require.Zero(t, tone.Gain)
 	require.Len(t, tone.HarmonicGains, NumHarmGains)
 	for _, gain := range tone.HarmonicGains {
-		require.Equal(t, float32(0), gain)
+		require.Zero(t, gain)
 	}
 }
 
@@ -47,10 +47,10 @@ func Test_NewToneAt(t *testing.T) {
 			require.NotEmpty(t, tone)
 			require.IsType(t, Tone{}, tone)
 			require.Equal(t, subtest.frequency, tone.Frequency)
-			require.Equal(t, float32(0), tone.Gain)
+			require.Zero(t, tone.Gain)
 			require.Len(t, tone.HarmonicGains, NumHarmGains)
 			for _, gain := range tone.HarmonicGains {
-				require.Equal(t, float32(0), gain)
+				require.Zero(t, gain)
 			}
 		})
 	}

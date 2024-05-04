@@ -31,12 +31,12 @@ func Test_NewContext(t *testing.T) {
 func Test_Context_Time(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
 		var ctx *Context
-		require.Equal(t, Time{}, ctx.Time())
+		require.Zero(t, ctx.Time())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
 		var ctx Context
-		require.Equal(t, Time{}, ctx.Time())
+		require.Zero(t, ctx.Time())
 	})
 
 	t.Run("initialized", func(t *testing.T) {
@@ -69,7 +69,7 @@ func Test_Context_SetTime(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
 		var ctx *Context
 		ctx.SetTime(Time{10, 20})
-		require.Equal(t, Time{}, ctx.Time())
+		require.Zero(t, ctx.Time())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
@@ -94,12 +94,12 @@ func Test_Context_SampleRate(t *testing.T) {
 
 	t.Run("nil pointer", func(t *testing.T) {
 		var ctx *Context
-		require.Equal(t, 0, ctx.SampleRate())
+		require.Zero(t, ctx.SampleRate())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
 		var ctx Context
-		require.Equal(t, 0, ctx.SampleRate())
+		require.Zero(t, ctx.SampleRate())
 	})
 
 	t.Run("initialized", func(t *testing.T) {
@@ -130,7 +130,7 @@ func Test_Context_SetSampleRate(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
 		var ctx *Context
 		ctx.SetSampleRate(10)
-		require.Equal(t, 0, ctx.SampleRate())
+		require.Zero(t, ctx.SampleRate())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
@@ -154,12 +154,12 @@ func Test_Context_NyqistFrequency(t *testing.T) {
 
 	t.Run("nil pointer", func(t *testing.T) {
 		var ctx *Context
-		require.Equal(t, float32(0), ctx.NyqistFrequency())
+		require.Zero(t, ctx.NyqistFrequency())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
 		var ctx Context
-		require.Equal(t, float32(0), ctx.NyqistFrequency())
+		require.Zero(t, ctx.NyqistFrequency())
 	})
 
 	t.Run("initialized", func(t *testing.T) {
