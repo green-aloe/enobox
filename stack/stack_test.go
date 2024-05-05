@@ -378,3 +378,58 @@ func Test_ConcurrentUse(t *testing.T) {
 		wg.Wait()
 	}
 }
+
+const (
+	benchOpPush benchOp = iota
+	benchOpPop
+	benchOpPeek
+	benchOpEmpty
+	benchOpSize
+	benchOpClear
+)
+
+type benchOp int
+
+func Benchmark_Push(b *testing.B) {
+	benchmark_operation(b, benchOpPush, 1_000_000)
+}
+func Benchmark_Pop(b *testing.B) {
+	benchmark_operation(b, benchOpPop, 1_000_000)
+}
+func Benchmark_Peek(b *testing.B) {
+	benchmark_operation(b, benchOpPeek, 1_000_000)
+}
+func Benchmark_Empty(b *testing.B) {
+	benchmark_operation(b, benchOpEmpty, 1_000_000)
+}
+func Benchmark_Size(b *testing.B) {
+	benchmark_operation(b, benchOpSize, 1_000_000)
+}
+func Benchmark_Clear(b *testing.B) {
+	benchmark_operation(b, benchOpClear, 1_000_000)
+}
+
+func benchmark_operation(b *testing.B, op benchOp, size int) {
+	var s Stack[int]
+	for i := 1; i <= size; i++ {
+		s.Push(i)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		switch op {
+		case benchOpPush:
+			s.Push(i)
+		case benchOpPop:
+			s.Pop()
+		case benchOpPeek:
+			s.Peek()
+		case benchOpEmpty:
+			s.Empty()
+		case benchOpSize:
+			s.Size()
+		case benchOpClear:
+			s.Clear()
+		}
+	}
+}
