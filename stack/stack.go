@@ -80,8 +80,8 @@ func (s *Stack[T]) Empty() bool {
 	return s.top == nil
 }
 
-// Size returns the number of elements in the stack.
-func (s *Stack[T]) Size() int {
+// Count returns the number of elements in the stack.
+func (s *Stack[T]) Count() int {
 	if s == nil {
 		return 0
 	}
@@ -89,12 +89,12 @@ func (s *Stack[T]) Size() int {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	size := 0
+	count := 0
 	for n := s.top; n != nil; n = n.next {
-		size++
+		count++
 	}
 
-	return size
+	return count
 }
 
 // Clear removes all elements from the stack.

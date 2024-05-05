@@ -30,7 +30,7 @@ func Test_Stack_Push(t *testing.T) {
 		require.NotPanics(t, func() { s.Push("1") })
 		require.NotPanics(t, func() { s.Push("2") })
 		require.NotPanics(t, func() { s.Push("3") })
-		require.Equal(t, 3, s.Size())
+		require.Equal(t, 3, s.Count())
 		require.Equal(t, "3", s.Pop())
 		require.Equal(t, "2", s.Pop())
 		require.Equal(t, "1", s.Pop())
@@ -49,7 +49,7 @@ func Test_Stack_Push(t *testing.T) {
 		}
 
 		wg.Wait()
-		require.Equal(t, 100, s.Size())
+		require.Equal(t, 100, s.Count())
 	})
 }
 
@@ -159,8 +159,8 @@ func Test_Stack_Peek(t *testing.T) {
 	})
 }
 
-// Test_Stack_Empty tests that Stack's Empty method returns true if the stack is empty for various
-// stack configurations.
+// Test_Stack_Empty tests that Stack's Empty method returns accurately determines if the stack is
+// empty for various stack configurations.
 func Test_Stack_Empty(t *testing.T) {
 	t.Run("nil stack", func(t *testing.T) {
 		var s *Stack[bool]
@@ -216,31 +216,31 @@ func Test_Stack_Empty(t *testing.T) {
 	})
 }
 
-// Test_Stack_Size tests that Stack's Size method returns the number of elements in the stack for
-// various stack configurations.
-func Test_Stack_Size(t *testing.T) {
+// Test_Stack_Count tests that Stack's Count method returns the correct number of elements in the
+// stack for various stack configurations.
+func Test_Stack_Count(t *testing.T) {
 	t.Run("nil stack", func(t *testing.T) {
 		var s *Stack[map[string]struct{}]
-		require.Zero(t, s.Size())
-		require.Zero(t, s.Size())
-		require.Zero(t, s.Size())
+		require.Zero(t, s.Count())
+		require.Zero(t, s.Count())
+		require.Zero(t, s.Count())
 	})
 
 	t.Run("empty stack", func(t *testing.T) {
 		var s Stack[chan<- int]
-		require.Zero(t, s.Size())
-		require.Zero(t, s.Size())
-		require.Zero(t, s.Size())
+		require.Zero(t, s.Count())
+		require.Zero(t, s.Count())
+		require.Zero(t, s.Count())
 	})
 
 	t.Run("non-empty stack", func(t *testing.T) {
 		var s Stack[string]
 		s.Push("a")
-		require.Equal(t, 1, s.Size())
+		require.Equal(t, 1, s.Count())
 		s.Push("b")
-		require.Equal(t, 2, s.Size())
+		require.Equal(t, 2, s.Count())
 		s.Push("c")
-		require.Equal(t, 3, s.Size())
+		require.Equal(t, 3, s.Count())
 	})
 
 	t.Run("concurrent use", func(t *testing.T) {
@@ -249,7 +249,7 @@ func Test_Stack_Size(t *testing.T) {
 		ch := make(chan int, 100)
 		for i := 0; i < 100; i++ {
 			go func() {
-				ch <- s.Size()
+				ch <- s.Count()
 			}()
 		}
 
@@ -265,7 +265,7 @@ func Test_Stack_Size(t *testing.T) {
 
 		for i := 0; i < 100; i++ {
 			go func() {
-				ch <- s.Size()
+				ch <- s.Count()
 			}()
 		}
 
@@ -367,7 +367,7 @@ func Test_ConcurrentUse(t *testing.T) {
 				case 11, 12:
 					s.Empty()
 				case 13, 14:
-					s.Size()
+					s.Count()
 				case 15:
 					if withClear {
 						s.Clear()
@@ -384,7 +384,7 @@ const (
 	benchOpPop
 	benchOpPeek
 	benchOpEmpty
-	benchOpSize
+	benchOpCount
 	benchOpClear
 )
 
@@ -402,8 +402,8 @@ func Benchmark_Peek(b *testing.B) {
 func Benchmark_Empty(b *testing.B) {
 	benchmark_operation(b, benchOpEmpty, 1_000_000)
 }
-func Benchmark_Size(b *testing.B) {
-	benchmark_operation(b, benchOpSize, 1_000_000)
+func Benchmark_Count(b *testing.B) {
+	benchmark_operation(b, benchOpCount, 1_000_000)
 }
 func Benchmark_Clear(b *testing.B) {
 	benchmark_operation(b, benchOpClear, 1_000_000)
@@ -426,8 +426,8 @@ func benchmark_operation(b *testing.B, op benchOp, size int) {
 			s.Peek()
 		case benchOpEmpty:
 			s.Empty()
-		case benchOpSize:
-			s.Size()
+		case benchOpCount:
+			s.Count()
 		case benchOpClear:
 			s.Clear()
 		}
