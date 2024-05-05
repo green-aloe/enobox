@@ -345,3 +345,36 @@ func Test_differentTypes(t *testing.T) {
 	require.Equal(t, "2", s.Pop())
 	require.Equal(t, 1, s.Pop())
 }
+
+// Test_ConcurrentUse tests that various Stack methods can be used concurrently without panicking.
+func Test_ConcurrentUse(t *testing.T) {
+	for _, withClear := range []bool{false, true} {
+		var s Stack[int]
+
+		var wg sync.WaitGroup
+		wg.Add(1_000_000)
+		for i := 0; i < 1_000_000; i++ {
+			go func(i int) {
+				defer wg.Done()
+
+				switch i % 16 {
+				case 0, 1, 2, 3:
+					s.Push(i)
+				case 4, 5, 6, 7:
+					s.Pop()
+				case 8, 9, 10:
+					s.Peek()
+				case 11, 12:
+					s.Empty()
+				case 13, 14:
+					s.Size()
+				case 15:
+					if withClear {
+						s.Clear()
+					}
+				}
+			}(i)
+		}
+		wg.Wait()
+	}
+}
