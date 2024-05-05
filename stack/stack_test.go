@@ -12,21 +12,21 @@ import (
 // stack configurations.
 func Test_Stack_Push(t *testing.T) {
 	t.Run("nil stack", func(t *testing.T) {
-		var s *Stack
+		var s *Stack[int32]
 		require.NotPanics(t, func() { s.Push(1) })
 		require.NotPanics(t, func() { s.Push(1) })
 		require.NotPanics(t, func() { s.Push(1) })
 	})
 
 	t.Run("empty stack", func(t *testing.T) {
-		var s Stack
+		var s Stack[float32]
 		require.NotPanics(t, func() { s.Push(1) })
 		require.NotPanics(t, func() { s.Push(1) })
 		require.NotPanics(t, func() { s.Push(1) })
 	})
 
 	t.Run("non-empty stack", func(t *testing.T) {
-		var s Stack
+		var s Stack[string]
 		require.NotPanics(t, func() { s.Push("1") })
 		require.NotPanics(t, func() { s.Push("2") })
 		require.NotPanics(t, func() { s.Push("3") })
@@ -37,7 +37,7 @@ func Test_Stack_Push(t *testing.T) {
 	})
 
 	t.Run("concurrent use", func(t *testing.T) {
-		var s Stack
+		var s Stack[int]
 
 		var wg sync.WaitGroup
 		for i := 0; i < 100; i++ {
@@ -57,21 +57,21 @@ func Test_Stack_Push(t *testing.T) {
 // stack for various stack configurations.
 func Test_Stack_Pop(t *testing.T) {
 	t.Run("nil stack", func(t *testing.T) {
-		var s *Stack
-		require.Nil(t, s.Pop())
-		require.Nil(t, s.Pop())
-		require.Nil(t, s.Pop())
+		var s *Stack[int32]
+		require.Zero(t, s.Pop())
+		require.Zero(t, s.Pop())
+		require.Zero(t, s.Pop())
 	})
 
 	t.Run("empty stack", func(t *testing.T) {
-		var s Stack
-		require.Nil(t, s.Pop())
-		require.Nil(t, s.Pop())
-		require.Nil(t, s.Pop())
+		var s Stack[rune]
+		require.Zero(t, s.Pop())
+		require.Zero(t, s.Pop())
+		require.Zero(t, s.Pop())
 	})
 
 	t.Run("non-empty stack", func(t *testing.T) {
-		var s Stack
+		var s Stack[int]
 		for i := 1; i <= 10; i++ {
 			s.Push(i)
 		}
@@ -81,7 +81,7 @@ func Test_Stack_Pop(t *testing.T) {
 	})
 
 	t.Run("concurrent use", func(t *testing.T) {
-		var s Stack
+		var s Stack[int]
 
 		var want []int
 		for i := 0; i < 100; i++ {
@@ -113,31 +113,31 @@ func Test_Stack_Pop(t *testing.T) {
 // removing it for various stack configurations.
 func Test_Stack_Peek(t *testing.T) {
 	t.Run("nil stack", func(t *testing.T) {
-		var s *Stack
-		require.Nil(t, s.Peek())
-		require.Nil(t, s.Peek())
-		require.Nil(t, s.Peek())
+		var s *Stack[[]rune]
+		require.Zero(t, s.Peek())
+		require.Zero(t, s.Peek())
+		require.Zero(t, s.Peek())
 	})
 
 	t.Run("empty stack", func(t *testing.T) {
-		var s Stack
-		require.Nil(t, s.Peek())
-		require.Nil(t, s.Peek())
-		require.Nil(t, s.Peek())
+		var s Stack[[]any]
+		require.Zero(t, s.Peek())
+		require.Zero(t, s.Peek())
+		require.Zero(t, s.Peek())
 	})
 
 	t.Run("non-empty stack", func(t *testing.T) {
-		var s Stack
-		s.Push("a")
-		s.Push("b")
-		s.Push("c")
-		require.Equal(t, "c", s.Peek())
-		require.Equal(t, "c", s.Peek())
-		require.Equal(t, "c", s.Peek())
+		var s Stack[rune]
+		s.Push('a')
+		s.Push('b')
+		s.Push('c')
+		require.Equal(t, 'c', s.Peek())
+		require.Equal(t, 'c', s.Peek())
+		require.Equal(t, 'c', s.Peek())
 	})
 
 	t.Run("concurrent use", func(t *testing.T) {
-		var s Stack
+		var s Stack[float64]
 		s.Push(1.1)
 		s.Push(2.2)
 		s.Push(3.3)
@@ -163,21 +163,21 @@ func Test_Stack_Peek(t *testing.T) {
 // stack configurations.
 func Test_Stack_Empty(t *testing.T) {
 	t.Run("nil stack", func(t *testing.T) {
-		var s *Stack
+		var s *Stack[bool]
 		require.True(t, s.Empty())
 		require.True(t, s.Empty())
 		require.True(t, s.Empty())
 	})
 
 	t.Run("empty stack", func(t *testing.T) {
-		var s Stack
+		var s Stack[[]bool]
 		require.True(t, s.Empty())
 		require.True(t, s.Empty())
 		require.True(t, s.Empty())
 	})
 
 	t.Run("non-empty stack", func(t *testing.T) {
-		var s Stack
+		var s Stack[rune]
 		for _, r := range "the quick brown fox jumps over the lazy dog" {
 			s.Push(r)
 			require.False(t, s.Empty())
@@ -186,7 +186,7 @@ func Test_Stack_Empty(t *testing.T) {
 	})
 
 	t.Run("concurrent use", func(t *testing.T) {
-		var s Stack
+		var s Stack[rune]
 
 		ch := make(chan bool, 100)
 		for i := 0; i < 100; i++ {
@@ -220,21 +220,21 @@ func Test_Stack_Empty(t *testing.T) {
 // various stack configurations.
 func Test_Stack_Size(t *testing.T) {
 	t.Run("nil stack", func(t *testing.T) {
-		var s *Stack
+		var s *Stack[map[string]struct{}]
 		require.Zero(t, s.Size())
 		require.Zero(t, s.Size())
 		require.Zero(t, s.Size())
 	})
 
 	t.Run("empty stack", func(t *testing.T) {
-		var s Stack
+		var s Stack[chan<- int]
 		require.Zero(t, s.Size())
 		require.Zero(t, s.Size())
 		require.Zero(t, s.Size())
 	})
 
 	t.Run("non-empty stack", func(t *testing.T) {
-		var s Stack
+		var s Stack[string]
 		s.Push("a")
 		require.Equal(t, 1, s.Size())
 		s.Push("b")
@@ -244,7 +244,7 @@ func Test_Stack_Size(t *testing.T) {
 	})
 
 	t.Run("concurrent use", func(t *testing.T) {
-		var s Stack
+		var s Stack[int]
 
 		ch := make(chan int, 100)
 		for i := 0; i < 100; i++ {
@@ -281,7 +281,7 @@ func Test_Stack_Size(t *testing.T) {
 // stack configurations.
 func Test_Stack_Clear(t *testing.T) {
 	t.Run("nil stack", func(t *testing.T) {
-		var s *Stack
+		var s *Stack[int32]
 		require.NotPanics(t, func() { s.Clear() })
 		require.True(t, s.Empty())
 
@@ -290,7 +290,7 @@ func Test_Stack_Clear(t *testing.T) {
 	})
 
 	t.Run("empty stack", func(t *testing.T) {
-		var s Stack
+		var s Stack[bool]
 		require.NotPanics(t, func() { s.Clear() })
 		require.True(t, s.Empty())
 
@@ -299,7 +299,7 @@ func Test_Stack_Clear(t *testing.T) {
 	})
 
 	t.Run("non-empty stack", func(t *testing.T) {
-		var s Stack
+		var s Stack[string]
 		s.Push("a")
 		s.Push("b")
 		s.Push("c")
@@ -309,7 +309,7 @@ func Test_Stack_Clear(t *testing.T) {
 	})
 
 	t.Run("concurrent use", func(t *testing.T) {
-		var s Stack
+		var s Stack[int]
 
 		for i := 0; i < 100; i++ {
 			go func() {
@@ -337,7 +337,7 @@ func Test_Stack_Clear(t *testing.T) {
 
 // Test_differentTypes tests that Stack can handle values of different types.
 func Test_differentTypes(t *testing.T) {
-	var s Stack
+	var s Stack[any]
 	s.Push(1)
 	s.Push("2")
 	s.Push(3.0)
