@@ -3,17 +3,69 @@ package context
 import (
 	"context"
 	"reflect"
+	"sort"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
+func Test_AddDecorator(t *testing.T) {
+	defer func() {
+		decorators = nil
+	}()
+
+	t.Run("nil decorator", func(t *testing.T) {
+		require.Len(t, decorators, 0)
+		AddDecorator(nil)
+		require.Len(t, decorators, 0)
+	})
+
+	t.Run("non-nil decorator", func(t *testing.T) {
+		require.Len(t, decorators, 0)
+		AddDecorator(func(ctx Context) context.Context { return ctx })
+		require.Len(t, decorators, 1)
+	})
+
+	t.Run("concurrent access", func(t *testing.T) {
+		decorators = nil
+
+		type key struct{}
+
+		var wg sync.WaitGroup
+		for i := 0; i < 1_000; i++ {
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				AddDecorator(func(Context) context.Context {
+					return context.WithValue(context.Background(), key{}, i)
+				})
+			}(i)
+		}
+
+		wg.Wait()
+		require.Len(t, decorators, 1_000)
+
+		ints := make([]int, 1_000)
+		for i, decorator := range decorators {
+			ctx := decorator(Context{})
+			require.NotNil(t, ctx)
+			v := ctx.Value(key{})
+			ints[i] = v.(int)
+		}
+		sort.Ints(ints)
+		for i, v := range ints {
+			require.Equal(t, i, v)
+		}
+	})
+}
+
 // Test_NewContext tests that NewContext returns a Context that has been initialized correctly.
 func Test_NewContext(t *testing.T) {
-	ctx := NewContext()
-	require.NotEmpty(t, ctx)
-
 	t.Run("types", func(t *testing.T) {
+		ctx := NewContext()
+		require.NotEmpty(t, ctx)
+
 		require.IsType(t, Context{}, ctx)
 
 		rt := reflect.TypeOf(&ctx)
@@ -22,8 +74,49 @@ func Test_NewContext(t *testing.T) {
 	})
 
 	t.Run("initial values", func(t *testing.T) {
+		ctx := NewContext()
 		require.Equal(t, NewTime(), ctx.Time())
 		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
+		require.IsType(t, context.Background(), ctx.Context)
+	})
+
+	t.Run("decorators", func(t *testing.T) {
+		decorators = nil
+		defer func() {
+			decorators = nil
+		}()
+
+		type (
+			key1 struct{}
+			key2 struct{}
+			key3 struct{}
+			key4 struct{}
+		)
+
+		AddDecorator(func(ctx Context) context.Context {
+			return context.WithValue(ctx, key1{}, "value1")
+		})
+		AddDecorator(func(ctx Context) context.Context {
+			return context.WithValue(ctx, key4{}, "value4")
+		})
+		AddDecorator(func(ctx Context) context.Context {
+			return nil
+		})
+		AddDecorator(func(ctx Context) context.Context {
+			ctx.SetSampleRate(123)
+			return ctx
+		})
+		AddDecorator(func(ctx Context) context.Context {
+			return context.WithValue(ctx, key2{}, "value2")
+		})
+
+		ctx := NewContext()
+		require.Equal(t, NewTime(), ctx.Time())
+		require.Equal(t, 123, ctx.SampleRate())
+		require.Equal(t, "value1", ctx.Value(key1{}))
+		require.Equal(t, "value2", ctx.Value(key2{}))
+		require.Nil(t, ctx.Value(key3{}))
+		require.Equal(t, "value4", ctx.Value(key4{}))
 	})
 }
 
