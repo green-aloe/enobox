@@ -60,6 +60,7 @@ func Test_SetSampleRate(t *testing.T) {
 
 // Test_SampleRate_Concurrency tests that SampleRate and SetSampleRate can be called concurrently.
 func Test_SampleRate_Concurrency(t *testing.T) {
+	require.Equal(t, 44_100, SampleRate())
 	defer SetSampleRate(DefaultSampleRate)
 
 	numRoutines := 100

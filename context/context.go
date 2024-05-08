@@ -37,10 +37,11 @@ func AddDecorator(decorator Decorator) {
 
 // NewContext sets up and returns a context for a single sample of audio.
 func NewContext() Context {
+	sampleRate := SampleRate()
 	ctx := Context{
 		Context:    context.Background(),
-		time:       NewTime(),
-		sampleRate: SampleRate(),
+		time:       NewTimeWith(sampleRate),
+		sampleRate: sampleRate,
 	}
 
 	if len(decorators) > 0 {

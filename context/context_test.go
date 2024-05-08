@@ -161,22 +161,24 @@ func Test_Context_Time(t *testing.T) {
 func Test_Context_SetTime(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
 		var ctx *Context
-		ctx.SetTime(Time{10, 20})
+		ctx.SetTime(Time{10, 20, 44_100})
 		require.Zero(t, ctx.Time())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
 		var ctx Context
-		ctx.SetTime(Time{10, 20})
+		ctx.SetTime(Time{10, 20, 44_100})
 		require.Equal(t, 10, ctx.Time().Second())
 		require.Equal(t, 20, ctx.Time().Sample())
+		require.Equal(t, 44_100, ctx.Time().SampleRate())
 	})
 
 	t.Run("initialized", func(t *testing.T) {
 		ctx := NewContext()
-		ctx.SetTime(Time{10, 20})
+		ctx.SetTime(Time{10, 20, 100})
 		require.Equal(t, 10, ctx.Time().Second())
 		require.Equal(t, 20, ctx.Time().Sample())
+		require.Equal(t, 100, ctx.Time().SampleRate())
 	})
 }
 
