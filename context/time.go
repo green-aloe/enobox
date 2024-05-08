@@ -11,13 +11,23 @@ type Time struct {
 	second int
 	// sample number in the current second
 	sample int
+	// number of samples in one second
+	sampleRate int
 }
 
-// NewTime returns a timestamp with the lowest value.
+// NewTime returns a timestamp with the lowest value. It uses the global sample rate to know how
+// many samples are in one second.
 func NewTime() Time {
+	return NewTimeWith(SampleRate())
+}
+
+// NewTimeWith returns a timestamp with the lowest value. It uses the provided sample rate to know
+// how many samples are in one second.
+func NewTimeWith(sampleRate int) Time {
 	return Time{
-		second: 0,
-		sample: 1,
+		second:     0,
+		sample:     1,
+		sampleRate: sampleRate,
 	}
 }
 
@@ -37,27 +47,32 @@ func (t Time) Sample() int {
 	return t.sample
 }
 
+// SampleRate returns the number of samples in one second.
+func (t Time) SampleRate() int {
+	return t.sampleRate
+}
+
 // ShiftBy shifts the timestamp by the number of samples and returns the new timestamp. This does
 // not modify the receiver. The number of samples can be positive or negative.
 func (t Time) ShiftBy(samples int) Time {
-	t.second += samples / SampleRate()
-	t.sample += samples % SampleRate()
+	t.second += samples / t.sampleRate
+	t.sample += samples % t.sampleRate
 
 	switch {
-	case t.sample > SampleRate():
+	case t.sample > t.sampleRate:
 		// We're overflowing the second. Bump up to the next second.
 		t.second++
-		t.sample -= SampleRate()
+		t.sample -= t.sampleRate
 
 	case t.sample <= 0:
 		// We're underflowing the second. Bump down to the previous second.
 		t.second--
-		t.sample += SampleRate()
+		t.sample += t.sampleRate
 	}
 
 	// If we went below 0 seconds, then reset the timestamp.
 	if t.second < 0 {
-		t = NewTime()
+		t = NewTimeWith(t.sampleRate)
 	}
 
 	return t
@@ -75,13 +90,18 @@ func (t Time) Decrement() Time {
 	return t.ShiftBy(-1)
 }
 
-// Duration calculates the duration between two timestamps to the nearest microsecond.
+// Duration calculates the duration between two timestamps to the nearest microsecond. The returned
+// duration is always positive. This returns 0 if the timestamps do not have the same sample rate.
 func (t Time) Duration(t2 Time) time.Duration {
+	if t.sampleRate != t2.sampleRate {
+		return 0
+	}
+
 	secondsDiff := t.second - t2.second
 	secondsDur := time.Duration(secondsDiff) * time.Second
 
 	samplesDiff := t.sample - t2.sample
-	samplesConv := float64(samplesDiff) / float64(SampleRate())
+	samplesConv := float64(samplesDiff) / float64(t.sampleRate)
 	samplesDur := time.Duration(samplesConv * float64(time.Second))
 
 	diff := (secondsDur + samplesDur).Abs()
@@ -95,8 +115,13 @@ func (t Time) Equal(t2 Time) bool {
 	return t == t2
 }
 
-// Before returns true if t represents a time that is earlier/lower than t2 does.
+// Before returns true if t represents a time that is earlier/lower than t2 does. This returns false
+// if the timestamps do not have the same sample rate.
 func (t Time) Before(t2 Time) bool {
+	if t.sampleRate != t2.sampleRate {
+		return false
+	}
+
 	if t.second != t2.second {
 		return t.second < t2.second
 	}
@@ -104,8 +129,13 @@ func (t Time) Before(t2 Time) bool {
 	return t.sample < t2.sample
 }
 
-// After returns true if t represents a time that is later/higher than t2 does.
+// After returns true if t represents a time that is later/higher than t2 does. This returns false
+// if the timestamps do not have the same sample rate.
 func (t Time) After(t2 Time) bool {
+	if t.sampleRate != t2.sampleRate {
+		return false
+	}
+
 	if t.second != t2.second {
 		return t.second > t2.second
 	}
@@ -115,9 +145,16 @@ func (t Time) After(t2 Time) bool {
 
 // String returns the human-readable representation of t.
 func (t Time) String() string {
+
 	suffix := "s"
-	if t.second == 1 {
+	if t.second == 1 || t.second == -1 {
 		suffix = ""
 	}
-	return fmt.Sprintf("%v second%s, sample %v/%v", t.second, suffix, t.sample, SampleRate())
+
+	s := fmt.Sprintf("%v second%s, sample %v/%v", t.second, suffix, t.sample, t.sampleRate)
+	if t.second < 0 || t.sample < 1 || t.sample > t.sampleRate {
+		s = "invalid time: " + s
+	}
+
+	return s
 }
