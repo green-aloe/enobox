@@ -1,6 +1,6 @@
 module github.com/green-aloe/enobox
 
-go 1.22.2
+go 1.22
 
 require (
 	github.com/faiface/beep v1.1.0
