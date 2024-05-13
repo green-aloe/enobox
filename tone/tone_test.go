@@ -1,8 +1,10 @@
 package tone
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/green-aloe/enobox/note"
 	"github.com/stretchr/testify/require"
 )
 
@@ -53,6 +55,48 @@ func Test_NewToneAt(t *testing.T) {
 				require.Zero(t, gain)
 			}
 		})
+	}
+}
+
+// Test_NewToneFrom tests that NewToneFrom returns a tone that has been initialized with the correct
+// fundamental frequency for various notes and octaves.
+func Test_NewToneFrom(t *testing.T) {
+
+	t.Run("invalid note", func(t *testing.T) {
+		tone := NewToneFrom(note.Note("H"), 5)
+		require.Equal(t, NewTone(), tone)
+
+		tone = NewToneFrom(note.Note(note.C+"b"), 5)
+		require.Equal(t, NewTone(), tone)
+	})
+
+	t.Run("invalid octave", func(t *testing.T) {
+		tone := NewToneFrom(note.C, -2)
+		require.Equal(t, NewTone(), tone)
+
+		tone = NewToneFrom(note.C, 11)
+		require.Equal(t, NewTone(), tone)
+	})
+
+	for _, note := range []note.Note{
+		note.C, note.CSharp, note.DFlat, note.D, note.DSharp, note.EFlat, note.E,
+		note.F, note.FSharp, note.GFlat, note.G, note.GSharp, note.AFlat, note.A,
+		note.ASharp, note.BFlat, note.B,
+	} {
+		for octave := -1; octave <= 10; octave++ {
+			t.Run(fmt.Sprintf("%v%v", note, octave), func(t *testing.T) {
+				tone := NewToneFrom(note, octave)
+				require.NotEmpty(t, tone)
+				require.IsType(t, Tone{}, tone)
+				require.Greater(t, tone.Frequency, float32(8))
+				require.Equal(t, note.Frequency(octave), tone.Frequency)
+				require.Zero(t, tone.Gain)
+				require.Len(t, tone.HarmonicGains, NumHarmGains)
+				for _, gain := range tone.HarmonicGains {
+					require.Equal(t, float32(0), gain)
+				}
+			})
+		}
 	}
 }
 

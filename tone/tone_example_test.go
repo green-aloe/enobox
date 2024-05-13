@@ -3,6 +3,7 @@ package tone_test
 import (
 	"fmt"
 
+	"github.com/green-aloe/enobox/note"
 	"github.com/green-aloe/enobox/tone"
 )
 
@@ -27,7 +28,7 @@ func ExampleNewToneAt() {
 }
 
 func ExampleNewToneFrom() {
-	tone := tone.NewToneFrom(tone.C, 5)
+	tone := tone.NewToneFrom(note.C, 5)
 	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
 	fmt.Println(tone.HarmonicGains)
 

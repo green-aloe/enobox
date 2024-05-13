@@ -2,6 +2,7 @@ package tone
 
 import (
 	"github.com/govalues/decimal"
+	"github.com/green-aloe/enobox/note"
 )
 
 const (
@@ -47,6 +48,11 @@ func NewToneAt(frequency float32) Tone {
 		Frequency:     frequency,
 		HarmonicGains: make([]float32, NumHarmGains),
 	}
+}
+
+// NewToneFrom initializes a tone from the specified note and octave.
+func NewToneFrom(note note.Note, octave int) Tone {
+	return NewToneAt(note.Frequency(octave))
 }
 
 // HarmonicFreq calculates the frequency of one of the tone's harmonic. The fundamental frequency
