@@ -24,3 +24,9 @@ const (
 )
 
 type Note string
+
+// Valid reports if the note is valid.
+func (note Note) Valid() bool {
+	_, ok := noteToSemitonesAboveC[note]
+	return ok
+}

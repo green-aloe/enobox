@@ -54,3 +54,62 @@ func Test_Notes(t *testing.T) {
 		require.IsType(t, note, B)
 	})
 }
+
+// Test_Note_Valid tests that Note's Valid method correctly reports if a note is valid.
+func Test_Note_Valid(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		require.True(t, C.Valid())
+		require.True(t, CSharp.Valid())
+		require.True(t, DFlat.Valid())
+		require.True(t, D.Valid())
+		require.True(t, DSharp.Valid())
+		require.True(t, EFlat.Valid())
+		require.True(t, E.Valid())
+		require.True(t, F.Valid())
+		require.True(t, FSharp.Valid())
+		require.True(t, GFlat.Valid())
+		require.True(t, G.Valid())
+		require.True(t, GSharp.Valid())
+		require.True(t, AFlat.Valid())
+		require.True(t, A.Valid())
+		require.True(t, ASharp.Valid())
+		require.True(t, BFlat.Valid())
+		require.True(t, B.Valid())
+
+	})
+
+	t.Run("accidentals", func(t *testing.T) {
+		require.True(t, (C + Sharp).Valid())
+		require.True(t, (D + Flat).Valid())
+		require.True(t, (D + Sharp).Valid())
+		require.True(t, (E + Flat).Valid())
+		require.True(t, (F + Sharp).Valid())
+		require.True(t, (G + Flat).Valid())
+		require.True(t, (G + Sharp).Valid())
+		require.True(t, (A + Flat).Valid())
+		require.True(t, (A + Sharp).Valid())
+		require.True(t, (B + Flat).Valid())
+
+		require.False(t, (C + Flat).Valid())
+		require.False(t, (E + Sharp).Valid())
+		require.False(t, (F + Flat).Valid())
+		require.False(t, (B + Sharp).Valid())
+
+		require.False(t, Note(Sharp).Valid())
+		require.False(t, Note(Flat).Valid())
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		require.False(t, Note("").Valid())
+	})
+
+	t.Run("gibberish", func(t *testing.T) {
+		require.False(t, Note("aklsdjf").Valid())
+	})
+
+	t.Run("misspellings", func(t *testing.T) {
+		require.False(t, (A + B).Valid())
+		require.False(t, (A + "b").Valid())
+		require.False(t, (C + "sharp").Valid())
+	})
+}
