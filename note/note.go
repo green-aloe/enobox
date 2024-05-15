@@ -36,3 +36,23 @@ func (note Note) Valid() bool {
 func (note Note) Frequency(octave int) float32 {
 	return noteToFrequency[note][octave]
 }
+
+// IncrementBy returns the note that is n half steps higher than the current note if n is positive,
+// or n half steps lower if n is negative. The original note is not modified. This returns an empty
+// note if note is invalid.
+func (note Note) IncrementBy(n int) Note {
+	if !note.Valid() {
+		return Note("")
+	}
+	if n%12 == 0 {
+		return note
+	}
+
+	semitones := noteToSemitonesAboveC[note] + n
+	semitones %= 12
+	if semitones < 0 {
+		semitones += 12
+	}
+
+	return semitonesAboveCToNote[semitones]
+}

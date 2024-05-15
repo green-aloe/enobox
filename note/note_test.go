@@ -249,3 +249,91 @@ func Test_Note_Frequency(t *testing.T) {
 		}
 	})
 }
+
+// Test_Note_IncrementBy tests that Note's IncrementBy method correctly increments or decrements a
+// note by a given number of half steps.
+func Test_Note_IncrementBy(t *testing.T) {
+	t.Run("invalid note", func(t *testing.T) {
+		require.Equal(t, Note(""), Note("").IncrementBy(0))
+		require.Equal(t, Note(""), Note("aslkjql34kfj").IncrementBy(1))
+		require.Equal(t, Note(""), Note(B+"sharp").IncrementBy(-1))
+	})
+
+	t.Run("no shift", func(t *testing.T) {
+		require.Equal(t, C, C.IncrementBy(0))
+		require.Equal(t, CSharp, CSharp.IncrementBy(0))
+		require.Equal(t, DFlat, DFlat.IncrementBy(0))
+		require.Equal(t, D, D.IncrementBy(0))
+		require.Equal(t, DSharp, DSharp.IncrementBy(0))
+		require.Equal(t, EFlat, EFlat.IncrementBy(0))
+		require.Equal(t, E, E.IncrementBy(0))
+		require.Equal(t, F, F.IncrementBy(0))
+		require.Equal(t, FSharp, FSharp.IncrementBy(0))
+		require.Equal(t, GFlat, GFlat.IncrementBy(0))
+		require.Equal(t, G, G.IncrementBy(0))
+		require.Equal(t, GSharp, GSharp.IncrementBy(0))
+		require.Equal(t, AFlat, AFlat.IncrementBy(0))
+		require.Equal(t, A, A.IncrementBy(0))
+		require.Equal(t, ASharp, ASharp.IncrementBy(0))
+		require.Equal(t, BFlat, BFlat.IncrementBy(0))
+		require.Equal(t, B, B.IncrementBy(0))
+	})
+
+	t.Run("positive shift", func(t *testing.T) {
+		for _, wantNotes := range [][]Note{
+			{C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B},
+			{CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B, C},
+			{DFlat, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B, C},
+			{D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B, C, CSharp},
+			{DSharp, E, F, FSharp, G, GSharp, A, ASharp, B, C, CSharp, D},
+			{EFlat, E, F, FSharp, G, GSharp, A, ASharp, B, C, CSharp, D},
+			{E, F, FSharp, G, GSharp, A, ASharp, B, C, CSharp, D, DSharp},
+			{F, FSharp, G, GSharp, A, ASharp, B, C, CSharp, D, DSharp, E},
+			{FSharp, G, GSharp, A, ASharp, B, C, CSharp, D, DSharp, E, F},
+			{GFlat, G, GSharp, A, ASharp, B, C, CSharp, D, DSharp, E, F},
+			{G, GSharp, A, ASharp, B, C, CSharp, D, DSharp, E, F, FSharp},
+			{GSharp, A, ASharp, B, C, CSharp, D, DSharp, E, F, FSharp, G},
+			{AFlat, A, ASharp, B, C, CSharp, D, DSharp, E, F, FSharp, G},
+			{A, ASharp, B, C, CSharp, D, DSharp, E, F, FSharp, G, GSharp},
+			{ASharp, B, C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A},
+			{BFlat, B, C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A},
+			{B, C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp},
+		} {
+			base := wantNotes[0]
+			for multiplier := 0; multiplier < 10; multiplier++ {
+				for i, wantNote := range wantNotes {
+					require.Equal(t, wantNote, base.IncrementBy((12*multiplier)+i))
+				}
+			}
+		}
+	})
+
+	t.Run("negative shift", func(t *testing.T) {
+		for _, wantNotes := range [][]Note{
+			{C, B, ASharp, A, GSharp, G, FSharp, F, E, DSharp, D, CSharp},
+			{CSharp, C, B, ASharp, A, GSharp, G, FSharp, F, E, DSharp, D},
+			{DFlat, C, B, ASharp, A, GSharp, G, FSharp, F, E, DSharp, D},
+			{D, CSharp, C, B, ASharp, A, GSharp, G, FSharp, F, E, DSharp},
+			{DSharp, D, CSharp, C, B, ASharp, A, GSharp, G, FSharp, F, E},
+			{EFlat, D, CSharp, C, B, ASharp, A, GSharp, G, FSharp, F, E},
+			{E, DSharp, D, CSharp, C, B, ASharp, A, GSharp, G, FSharp, F},
+			{F, E, DSharp, D, CSharp, C, B, ASharp, A, GSharp, G, FSharp},
+			{FSharp, F, E, DSharp, D, CSharp, C, B, ASharp, A, GSharp, G},
+			{GFlat, F, E, DSharp, D, CSharp, C, B, ASharp, A, GSharp, G},
+			{G, FSharp, F, E, DSharp, D, CSharp, C, B, ASharp, A, GSharp},
+			{GSharp, G, FSharp, F, E, DSharp, D, CSharp, C, B, ASharp, A},
+			{AFlat, G, FSharp, F, E, DSharp, D, CSharp, C, B, ASharp, A},
+			{A, GSharp, G, FSharp, F, E, DSharp, D, CSharp, C, B, ASharp},
+			{ASharp, A, GSharp, G, FSharp, F, E, DSharp, D, CSharp, C, B},
+			{BFlat, A, GSharp, G, FSharp, F, E, DSharp, D, CSharp, C, B},
+			{B, ASharp, A, GSharp, G, FSharp, F, E, DSharp, D, CSharp, C},
+		} {
+			base := wantNotes[0]
+			for multiplier := 0; multiplier < 10; multiplier++ {
+				for i, wantNote := range wantNotes {
+					require.Equal(t, wantNote, base.IncrementBy(-((12 * multiplier) + i)))
+				}
+			}
+		}
+	})
+}
