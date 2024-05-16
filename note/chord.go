@@ -17,3 +17,9 @@ const (
 )
 
 type ChordName string
+
+// Valid reports if the chord name is valid.
+func (name ChordName) Valid() bool {
+	_, ok := chordToSemitonesList[name]
+	return ok
+}

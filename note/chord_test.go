@@ -37,3 +37,36 @@ func Test_ChordNames(t *testing.T) {
 	require.Equal(t, ChordName("halfdim7"), HalfDiminished7)
 	require.IsType(t, name, HalfDiminished7)
 }
+
+// Test_ChordName_Valid tests that ChordName's Valid method correctly reports if a chord name is valid.
+func Test_ChordName_Valid(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		require.True(t, Major.Valid())
+		require.True(t, Major6.Valid())
+		require.True(t, Dom7.Valid())
+		require.True(t, Major7.Valid())
+		require.True(t, Augmented.Valid())
+		require.True(t, Augmented7.Valid())
+		require.True(t, Minor.Valid())
+		require.True(t, Minor6.Valid())
+		require.True(t, Minor7.Valid())
+		require.True(t, MinorMajor7.Valid())
+		require.True(t, Diminished.Valid())
+		require.True(t, Diminished7.Valid())
+		require.True(t, HalfDiminished7.Valid())
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		require.True(t, ChordName("").Valid())
+	})
+
+	t.Run("gibberish", func(t *testing.T) {
+		require.False(t, ChordName("l4tjgq3").Valid())
+	})
+
+	t.Run("misspellings", func(t *testing.T) {
+		require.False(t, ChordName("Maj6").Valid())
+		require.False(t, (Minor + Diminished).Valid())
+		require.False(t, (Diminished + "6").Valid())
+	})
+}
