@@ -7,27 +7,36 @@ import (
 )
 
 func ExampleNote_Valid() {
-	fmt.Println(note.C.Valid())
-	fmt.Println(note.Note("H").Valid())
+	note1 := note.C
+	valid1 := note1.Valid()
+
+	note2 := note.Note("X")
+	valid2 := note2.Valid()
+
+	fmt.Println(valid1, valid2)
 
 	// Output:
-	// true
-	// false
+	// true false
 }
 
 func ExampleNote_Frequency() {
-	fmt.Println(note.C.Frequency(4))
+	note := note.C
+	octave := 4
+	freq := note.Frequency(octave)
+
+	fmt.Println(freq)
 
 	// Output:
 	// 261.6256
 }
 
 func ExampleNote_IncrementBy() {
-	note := note.EFlat
-	fmt.Println(note.IncrementBy(3), note)
-	fmt.Println(note.IncrementBy(-3), note)
+	note1 := note.EFlat
+	note2 := note1.IncrementBy(3)
+	note3 := note1.IncrementBy(-3)
+
+	fmt.Println(note1, note2, note3)
 
 	// Output:
-	// F♯ E♭
-	// C E♭
+	// E♭ F♯ C
 }
