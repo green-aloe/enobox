@@ -14,7 +14,9 @@ func ExampleAddDecorator() {
 	})
 
 	ctx := context.NewContext()
-	fmt.Println(ctx.Value(ctxKeyMinFreq{}))
+	minFreq := ctx.Value(ctxKeyMinFreq{})
+
+	fmt.Println(minFreq)
 
 	// Output:
 	// 22.22
@@ -22,9 +24,11 @@ func ExampleAddDecorator() {
 
 func ExampleNewContext() {
 	ctx := context.NewContext()
+	time := ctx.Time()
+	sampleRate := ctx.SampleRate()
 
-	fmt.Println(ctx.Time())
-	fmt.Println(ctx.SampleRate())
+	fmt.Println(time)
+	fmt.Println(sampleRate)
 
 	// Output:
 	// 0 seconds, sample 1/44100
@@ -33,8 +37,9 @@ func ExampleNewContext() {
 
 func ExampleContext_Time() {
 	ctx := context.NewContext()
+	time := ctx.Time()
 
-	fmt.Println(ctx.Time())
+	fmt.Println(time)
 
 	// Output:
 	// 0 seconds, sample 1/44100
@@ -42,44 +47,54 @@ func ExampleContext_Time() {
 
 func ExampleContext_SetTime() {
 	ctx := context.NewContext()
+	time1 := ctx.Time()
 
-	fmt.Println(ctx.Time())
-	ctx.SetTime(ctx.Time().Increment())
-	fmt.Println(ctx.Time())
+	time2 := time1.Increment()
+	ctx.SetTime(time2)
+	time3 := ctx.Time()
+
+	fmt.Println(time1)
+	fmt.Println(time2)
+	fmt.Println(time3)
 
 	// Output:
 	// 0 seconds, sample 1/44100
+	// 0 seconds, sample 2/44100
 	// 0 seconds, sample 2/44100
 }
 
 func ExampleContext_SampleRate() {
 	ctx := context.NewContext()
+	sampleRate := ctx.SampleRate()
 
-	fmt.Println(ctx.SampleRate())
+	fmt.Println(sampleRate)
+
 	// Output:
 	// 44100
 }
 
 func ExampleContext_SetSampleRate() {
 	ctx := context.NewContext()
+	sampleRate1 := ctx.SampleRate()
 
-	fmt.Println(ctx.SampleRate())
 	ctx.SetSampleRate(48_000)
-	fmt.Println(ctx.SampleRate())
+	sampleRate2 := ctx.SampleRate()
+
+	fmt.Println(sampleRate1, sampleRate2)
 
 	// Output:
-	// 44100
-	// 48000
+	// 44100 48000
 }
 
 func ExampleContext_NyqistFrequency() {
 	ctx := context.NewContext()
+	nyquistFreq1 := ctx.NyqistFrequency()
 
-	fmt.Println(ctx.NyqistFrequency())
 	ctx.SetSampleRate(48_000)
-	fmt.Println(ctx.NyqistFrequency())
+	nyquistFreq2 := ctx.NyqistFrequency()
+
+	fmt.Println(nyquistFreq1, nyquistFreq2)
 
 	// Output:
-	// 22050
-	// 24000
+	// 22050 24000
 }
