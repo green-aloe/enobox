@@ -8,6 +8,7 @@ import (
 
 func ExampleNewTime() {
 	time := context.NewTime()
+
 	fmt.Println(time)
 
 	// Output:
@@ -16,6 +17,7 @@ func ExampleNewTime() {
 
 func ExampleNewTimeWith() {
 	time := context.NewTimeWith(48_000)
+
 	fmt.Println(time)
 
 	// Output:
@@ -24,7 +26,9 @@ func ExampleNewTimeWith() {
 
 func ExampleTime_Second() {
 	time := context.NewTime()
-	fmt.Println(time.Second())
+	second := time.Second()
+
+	fmt.Println(second)
 
 	// Output:
 	// 0
@@ -32,7 +36,9 @@ func ExampleTime_Second() {
 
 func ExampleTime_Sample() {
 	time := context.NewTime()
-	fmt.Println(time.Sample())
+	sample := time.Sample()
+
+	fmt.Println(sample)
 
 	// Output:
 	// 1
@@ -90,69 +96,76 @@ func ExampleTime_Duration() {
 	time1 := context.NewTime()
 	time2 := context.NewTime().ShiftBy(context.SampleRate())
 
-	fmt.Println(time1.Duration(time2))
-	fmt.Println(time2.Duration(time1))
+	duration1 := time1.Duration(time2)
+	duration2 := time2.Duration(time1)
+
+	fmt.Println(duration1, duration2)
 
 	// Output:
-	// 1s
-	// 1s
+	// 1s 1s
 }
 
 func ExampleTime_Equal() {
 	time1 := context.NewTime()
 	time2 := context.NewTime()
 
-	fmt.Println(time1.Equal(time2))
+	isEqual1 := time1.Equal(time2)
 
 	time2 = time2.Increment()
-	fmt.Println(time1.Equal(time2))
+	isEqual2 := time1.Equal(time2)
+
+	fmt.Println(isEqual1, isEqual2)
 
 	// Output:
-	// true
-	// false
+	// true false
 }
 
 func ExampleTime_Before() {
 	time1 := context.NewTime()
 	time2 := context.NewTime()
 
-	fmt.Println(time1.Before(time2))
+	before1a := time1.Before(time2)
+	before1b := time2.Before(time1)
 
 	time2 = time2.Increment()
-	fmt.Println(time1.Before(time2))
-	fmt.Println(time2.Before(time1))
+	before2a := time1.Before(time2)
+	before2b := time2.Before(time1)
+
+	fmt.Println(before1a, before1b)
+	fmt.Println(before2a, before2b)
 
 	// Output:
-	// false
-	// true
-	// false
+	// false false
+	// true false
 }
 
 func ExampleTime_After() {
 	time1 := context.NewTime()
 	time2 := context.NewTime()
 
-	fmt.Println(time1.After(time2))
+	after1a := time1.After(time2)
+	after1b := time2.After(time1)
 
 	time2 = time2.Increment()
-	fmt.Println(time1.After(time2))
-	fmt.Println(time2.After(time1))
+	after2a := time1.After(time2)
+	after2b := time2.After(time1)
+
+	fmt.Println(after1a, after1b)
+	fmt.Println(after2a, after2b)
 
 	// Output:
-	// false
-	// false
-	// true
+	// false false
+	// false true
 }
 
 func ExampleTime_String() {
-	time := context.NewTime()
-	fmt.Println(time)
+	time1 := context.NewTime()
+	time2 := time1.ShiftBy(context.SampleRate()).ShiftBy(100)
+	time3 := time2.ShiftBy(context.SampleRate()).ShiftBy(100)
 
-	time = time.ShiftBy(context.SampleRate()).ShiftBy(100)
-	fmt.Println(time)
-
-	time = time.ShiftBy(context.SampleRate()).ShiftBy(100)
-	fmt.Println(time)
+	fmt.Println(time1)
+	fmt.Println(time2)
+	fmt.Println(time3)
 
 	// Output:
 	// 0 seconds, sample 1/44100
