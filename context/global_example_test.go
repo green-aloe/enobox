@@ -7,7 +7,9 @@ import (
 )
 
 func ExampleSampleRate() {
-	fmt.Println(context.SampleRate())
+	sampleRate := context.SampleRate()
+
+	fmt.Println(sampleRate)
 
 	// Output:
 	// 44100
@@ -16,11 +18,12 @@ func ExampleSampleRate() {
 func ExampleSetSampleRate() {
 	defer context.SetSampleRate(context.DefaultSampleRate)
 
-	fmt.Println(context.SampleRate())
+	sampleRate1 := context.SampleRate()
 	context.SetSampleRate(48_000)
-	fmt.Println(context.SampleRate())
+	sampleRate2 := context.SampleRate()
+
+	fmt.Println(sampleRate1, sampleRate2)
 
 	// Output:
-	// 44100
-	// 48000
+	// 44100 48000
 }
