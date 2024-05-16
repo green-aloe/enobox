@@ -9,6 +9,7 @@ import (
 
 func ExampleNewTone() {
 	tone := tone.NewTone()
+
 	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
 	fmt.Println(tone.HarmonicGains)
 
@@ -19,6 +20,7 @@ func ExampleNewTone() {
 
 func ExampleNewToneAt() {
 	tone := tone.NewToneAt(523.2511)
+
 	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
 	fmt.Println(tone.HarmonicGains)
 
@@ -29,6 +31,7 @@ func ExampleNewToneAt() {
 
 func ExampleNewToneFrom() {
 	tone := tone.NewToneFrom(note.C, 5)
+
 	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
 	fmt.Println(tone.HarmonicGains)
 
@@ -39,6 +42,7 @@ func ExampleNewToneFrom() {
 
 func ExampleNewSquareTone() {
 	sqrTone := tone.NewSquareTone(440)
+
 	fmt.Println(sqrTone.Frequency, sqrTone.Gain, len(sqrTone.HarmonicGains))
 	fmt.Println(sqrTone.HarmonicGains)
 
@@ -50,6 +54,7 @@ func ExampleNewSquareTone() {
 			gains[i] = tone.Trunc(1/float32(i+2), tone.MaxSigFigs)
 		}
 	}
+
 	fmt.Println(gains)
 
 	// Output:
@@ -60,6 +65,7 @@ func ExampleNewSquareTone() {
 
 func ExampleNewTriangleTone() {
 	triTone := tone.NewTriangleTone(440)
+
 	fmt.Println(triTone.Frequency, triTone.Gain, len(triTone.HarmonicGains))
 	fmt.Println(triTone.HarmonicGains)
 
@@ -71,6 +77,7 @@ func ExampleNewTriangleTone() {
 			gains[i] = tone.Trunc(1/float32((i+2)*(i+2)), tone.MaxSigFigs)
 		}
 	}
+
 	fmt.Println(gains)
 
 	// Output:
@@ -81,6 +88,7 @@ func ExampleNewTriangleTone() {
 
 func ExampleNewSawtoothTone() {
 	sawTone := tone.NewSawtoothTone(440)
+
 	fmt.Println(sawTone.Frequency, sawTone.Gain, len(sawTone.HarmonicGains))
 	fmt.Println(sawTone.HarmonicGains)
 
@@ -90,6 +98,7 @@ func ExampleNewSawtoothTone() {
 	for i := range gains {
 		gains[i] = tone.Trunc(1/float32(i+2), tone.MaxSigFigs)
 	}
+
 	fmt.Println(gains)
 
 	// Output:
@@ -100,18 +109,18 @@ func ExampleNewSawtoothTone() {
 
 func ExampleTone_HarmonicFreq() {
 	tone := tone.NewTone()
-	fmt.Println(tone.HarmonicFreq(2))
+	harmFreq1 := tone.HarmonicFreq(2)
 
 	tone.Frequency = 440
-	fmt.Println(tone.HarmonicFreq(1))
-	fmt.Println(tone.HarmonicFreq(2))
-	fmt.Println(tone.HarmonicFreq(3))
+
+	harmFreq2 := tone.HarmonicFreq(1)
+	harmFreq3 := tone.HarmonicFreq(2)
+	harmFreq4 := tone.HarmonicFreq(3)
+
+	fmt.Println(harmFreq1, harmFreq2, harmFreq3, harmFreq4)
 
 	// Output:
-	// 0
-	// 440
-	// 880
-	// 1320
+	// 0 440 880 1320
 }
 
 func ExampleTone_Clone() {
@@ -131,24 +140,27 @@ func ExampleTone_Clone() {
 
 func ExampleTone_Empty() {
 	tone := tone.NewTone()
-	fmt.Println(tone.Empty())
+	isEmpty1 := tone.Empty()
 
 	tone.Frequency = 440
-	fmt.Println(tone.Empty())
+	isEmpty2 := tone.Empty()
 
-	tone.Frequency = 0
-	tone.Gain = 1
-	fmt.Println(tone.Empty())
+	tone.Frequency, tone.Gain = 0, 1
+	isEmpty3 := tone.Empty()
+
+	fmt.Println(isEmpty1, isEmpty2, isEmpty3)
 
 	// Output:
-	// true
-	// false
-	// false
+	// true false false
 }
 
 func ExampleTrunc() {
-	for _, f := range []float32{0.123456789, 0.987654321, 99.99} {
-		fmt.Println(f, tone.Trunc(f, 3), tone.Trunc(f, tone.MaxSigFigs))
+	frequencies := []float32{0.123456789, 0.987654321, 99.99}
+	for _, f1 := range frequencies {
+		f2 := tone.Trunc(f1, 3)
+		f3 := tone.Trunc(f1, tone.MaxSigFigs)
+
+		fmt.Println(f1, f2, f3)
 	}
 
 	// Output:
