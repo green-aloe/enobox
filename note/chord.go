@@ -23,3 +23,10 @@ func (name ChordName) Valid() bool {
 	_, ok := chordToSemitonesList[name]
 	return ok
 }
+
+// A Chord is a list of three or more notes that starts with a base note and goes up in ascending order.
+type Chord struct {
+	root  Note
+	name  ChordName
+	notes []Note
+}
