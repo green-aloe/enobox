@@ -107,3 +107,52 @@ func Test_NewChord(t *testing.T) {
 		require.Equal(t, Chord{B, Major7, []Note{B, DSharp, FSharp, ASharp}}, NewChord(B, Major7))
 	})
 }
+
+// Test_Chord_Valid tests that Chord's Valid method XXX
+func Test_Chord_Valid(t *testing.T) {
+	t.Run("empty", func(t *testing.T) {
+		require.False(t, Chord{}.Valid())
+	})
+
+	t.Run("missing root", func(t *testing.T) {
+		require.False(t, Chord{Note(""), Major, []Note{A, B, C}}.Valid())
+	})
+
+	t.Run("invalid root", func(t *testing.T) {
+		require.False(t, Chord{Note("lkj2"), Major, []Note{A, B, C}}.Valid())
+	})
+
+	t.Run("mismatched root", func(t *testing.T) {
+		require.False(t, Chord{B, Major, []Note{A, B, C}}.Valid())
+		require.False(t, Chord{C, Major, []Note{A, B, C}}.Valid())
+		require.False(t, Chord{D, Major, []Note{A, B, C}}.Valid())
+	})
+
+	t.Run("missing chord", func(t *testing.T) {
+		require.False(t, Chord{A, ChordName(""), []Note{A, B, C}}.Valid())
+	})
+
+	t.Run("invalid chord", func(t *testing.T) {
+		require.False(t, Chord{A, ChordName("1w9j2"), []Note{A, B, C}}.Valid())
+	})
+
+	t.Run("missing notes", func(t *testing.T) {
+		require.False(t, Chord{A, Major, []Note{}}.Valid())
+		require.False(t, Chord{A, Major, []Note{A}}.Valid())
+		require.False(t, Chord{A, Major, []Note{A, B}}.Valid())
+	})
+
+	t.Run("invalid notes", func(t *testing.T) {
+		require.False(t, Chord{A, Major, []Note{"irfj", B, C}}.Valid())
+		require.False(t, Chord{A, Major, []Note{A, "skdj", C}}.Valid())
+		require.False(t, Chord{A, Major, []Note{A, B, "234jf"}}.Valid())
+		require.False(t, Chord{A, Major, []Note{"109fj", "asdvj", "1238"}}.Valid())
+	})
+
+	t.Run("valid", func(t *testing.T) {
+		require.True(t, Chord{A, Major, []Note{A, B, C}}.Valid())
+		require.True(t, Chord{G, MinorMajor7, []Note{G, A, B, C}}.Valid())
+		require.True(t, Chord{FSharp, Minor7, []Note{FSharp, A, CSharp, E}}.Valid())
+		require.True(t, NewChord(BFlat, Dom7).Valid())
+	})
+}

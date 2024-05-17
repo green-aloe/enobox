@@ -50,8 +50,23 @@ func NewChord(root Note, name ChordName) Chord {
 	}
 }
 
+// Valid reports if the chord is valid.
+func (c Chord) Valid() bool {
+	if !c.root.Valid() || !c.name.Valid() || len(c.notes) < 3 || c.root != c.notes[0] {
+		return false
+	}
+
+	for _, note := range c.notes {
+		if !note.Valid() {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (c Chord) String() string {
-	if c.root == "" || c.name == "" {
+	if !c.Valid() {
 		return "invalid chord"
 	}
 
