@@ -70,3 +70,38 @@ func Test_ChordName_Valid(t *testing.T) {
 		require.False(t, (Diminished + "6").Valid())
 	})
 }
+
+// Test_NewChord tests that NewChord builds the correct chord depending on the root note and chord name.
+func Test_NewChord(t *testing.T) {
+	t.Run("invalid root", func(t *testing.T) {
+		require.Equal(t, Chord{}, NewChord(Note("Z"), Major))
+	})
+
+	t.Run("invalid chord", func(t *testing.T) {
+		require.Equal(t, Chord{}, NewChord(C, ChordName("invalid")))
+	})
+
+	t.Run("invalid root and chord", func(t *testing.T) {
+		require.Equal(t, Chord{}, NewChord(A+B, Major+Minor))
+	})
+
+	t.Run("valid", func(t *testing.T) {
+		require.Equal(t, Chord{C, Major, []Note{C, E, G}}, NewChord(C, Major))
+		require.Equal(t, Chord{CSharp, Major6, []Note{CSharp, F, GSharp, ASharp}}, NewChord(CSharp, Major6))
+		require.Equal(t, Chord{DFlat, Dom7, []Note{DFlat, F, GSharp, B}}, NewChord(DFlat, Dom7))
+		require.Equal(t, Chord{D, Major7, []Note{D, FSharp, A, CSharp}}, NewChord(D, Major7))
+		require.Equal(t, Chord{DSharp, Augmented, []Note{DSharp, G, B}}, NewChord(DSharp, Augmented))
+		require.Equal(t, Chord{EFlat, Augmented7, []Note{EFlat, G, B, CSharp}}, NewChord(EFlat, Augmented7))
+		require.Equal(t, Chord{E, Minor, []Note{E, G, B}}, NewChord(E, Minor))
+		require.Equal(t, Chord{F, Minor6, []Note{F, GSharp, C, D}}, NewChord(F, Minor6))
+		require.Equal(t, Chord{FSharp, Minor7, []Note{FSharp, A, CSharp, E}}, NewChord(FSharp, Minor7))
+		require.Equal(t, Chord{GFlat, MinorMajor7, []Note{GFlat, A, CSharp, F}}, NewChord(GFlat, MinorMajor7))
+		require.Equal(t, Chord{G, Diminished, []Note{G, ASharp, CSharp}}, NewChord(G, Diminished))
+		require.Equal(t, Chord{GSharp, Diminished7, []Note{GSharp, B, D, F}}, NewChord(GSharp, Diminished7))
+		require.Equal(t, Chord{AFlat, HalfDiminished7, []Note{AFlat, B, D, FSharp}}, NewChord(AFlat, HalfDiminished7))
+		require.Equal(t, Chord{A, Major, []Note{A, CSharp, E}}, NewChord(A, Major))
+		require.Equal(t, Chord{ASharp, Major6, []Note{ASharp, D, F, G}}, NewChord(ASharp, Major6))
+		require.Equal(t, Chord{BFlat, Dom7, []Note{BFlat, D, F, GSharp}}, NewChord(BFlat, Dom7))
+		require.Equal(t, Chord{B, Major7, []Note{B, DSharp, FSharp, ASharp}}, NewChord(B, Major7))
+	})
+}

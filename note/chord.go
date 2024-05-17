@@ -30,3 +30,30 @@ type Chord struct {
 	name  ChordName
 	notes []Note
 }
+
+// NewChord creates a new chord (list of notes) from a root note and a pre-defined chord name. If
+// the root note or chord name is invalid, this returns an empty chord.
+func NewChord(root Note, name ChordName) Chord {
+	if !root.Valid() || !name.Valid() {
+		return Chord{}
+	}
+
+	var notes []Note
+	for _, semitone := range chordToSemitonesList[name] {
+		notes = append(notes, root.IncrementBy(semitone))
+	}
+
+	return Chord{
+		root:  root,
+		name:  name,
+		notes: notes,
+	}
+}
+
+func (c Chord) String() string {
+	if c.root == "" || c.name == "" {
+		return "invalid chord"
+	}
+
+	return string(c.root) + string(c.name)
+}
