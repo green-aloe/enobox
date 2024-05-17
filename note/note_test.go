@@ -75,7 +75,6 @@ func Test_Note_Valid(t *testing.T) {
 		require.True(t, ASharp.Valid())
 		require.True(t, BFlat.Valid())
 		require.True(t, B.Valid())
-
 	})
 
 	t.Run("accidentals", func(t *testing.T) {
