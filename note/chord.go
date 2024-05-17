@@ -1,7 +1,7 @@
 package note
 
 const (
-	Major           ChordName = ""         // Major chord
+	Major           ChordName = "maj"      // Major chord
 	Major6          ChordName = "maj6"     // Major sixth chord
 	Dom7            ChordName = "dom7"     // Dominant seventh chord
 	Major7          ChordName = "maj7"     // Major seventh chord

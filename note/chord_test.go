@@ -10,7 +10,7 @@ import (
 func Test_ChordNames(t *testing.T) {
 	var name ChordName
 
-	require.Equal(t, ChordName(""), Major)
+	require.Equal(t, ChordName("maj"), Major)
 	require.IsType(t, name, Major)
 	require.Equal(t, ChordName("maj6"), Major6)
 	require.IsType(t, name, Major6)
@@ -57,7 +57,7 @@ func Test_ChordName_Valid(t *testing.T) {
 	})
 
 	t.Run("empty", func(t *testing.T) {
-		require.True(t, ChordName("").Valid())
+		require.False(t, ChordName("").Valid())
 	})
 
 	t.Run("gibberish", func(t *testing.T) {
@@ -74,10 +74,12 @@ func Test_ChordName_Valid(t *testing.T) {
 // Test_NewChord tests that NewChord builds the correct chord depending on the root note and chord name.
 func Test_NewChord(t *testing.T) {
 	t.Run("invalid root", func(t *testing.T) {
+		require.Equal(t, Chord{}, NewChord(Note(""), Major))
 		require.Equal(t, Chord{}, NewChord(Note("Z"), Major))
 	})
 
 	t.Run("invalid chord", func(t *testing.T) {
+		require.Equal(t, Chord{}, NewChord(C, ChordName("")))
 		require.Equal(t, Chord{}, NewChord(C, ChordName("invalid")))
 	})
 
