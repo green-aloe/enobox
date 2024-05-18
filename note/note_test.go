@@ -117,14 +117,14 @@ func Test_Note_Valid(t *testing.T) {
 // notes and octaves.
 func Test_Note_Frequency(t *testing.T) {
 	t.Run("invalid note", func(t *testing.T) {
-		require.Equal(t, float32(0), Note("").Frequency(0))
-		require.Equal(t, float32(0), Note("asglkaj3rqjw").Frequency(0))
-		require.Equal(t, float32(0), (A + B).Frequency(0))
+		require.Zero(t, Note("").Frequency(0))
+		require.Zero(t, Note("asglkaj3rqjw").Frequency(0))
+		require.Zero(t, (A + B).Frequency(0))
 	})
 
 	t.Run("invalid octave", func(t *testing.T) {
-		require.Equal(t, float32(0), C.Frequency(-2))
-		require.Equal(t, float32(0), C.Frequency(11))
+		require.Zero(t, C.Frequency(-2))
+		require.Zero(t, C.Frequency(11))
 	})
 
 	t.Run("valid", func(t *testing.T) {
@@ -253,9 +253,9 @@ func Test_Note_Frequency(t *testing.T) {
 // note by a given number of half steps.
 func Test_Note_IncrementBy(t *testing.T) {
 	t.Run("invalid note", func(t *testing.T) {
-		require.Equal(t, Note(""), Note("").IncrementBy(0))
-		require.Equal(t, Note(""), Note("aslkjql34kfj").IncrementBy(1))
-		require.Equal(t, Note(""), Note(B+"sharp").IncrementBy(-1))
+		require.Zero(t, Note("").IncrementBy(0))
+		require.Zero(t, Note("aslkjql34kfj").IncrementBy(1))
+		require.Zero(t, Note(B+"sharp").IncrementBy(-1))
 	})
 
 	t.Run("no shift", func(t *testing.T) {

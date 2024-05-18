@@ -93,7 +93,7 @@ func Test_NewToneFrom(t *testing.T) {
 				require.Zero(t, tone.Gain)
 				require.Len(t, tone.HarmonicGains, NumHarmGains)
 				for _, gain := range tone.HarmonicGains {
-					require.Equal(t, float32(0), gain)
+					require.Zero(t, gain)
 				}
 			})
 		}
