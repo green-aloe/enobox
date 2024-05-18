@@ -222,3 +222,22 @@ func Test_Chord_Name(t *testing.T) {
 		require.Equal(t, MinorMajor7, chord.Name())
 	})
 }
+
+// Test_Chord_Notes tests that Chord's Notes method returns the correct notes, or an empty list if
+// the chord is invalid.
+func Test_Chord_Notes(t *testing.T) {
+	t.Run("empty", func(t *testing.T) {
+		var chord Chord
+		require.Zero(t, chord.Notes())
+	})
+
+	t.Run("invalid", func(t *testing.T) {
+		chord := Chord{Note("asdlkfj"), Major, []Note{A, B, C}}
+		require.Zero(t, chord.Notes())
+	})
+
+	t.Run("valid", func(t *testing.T) {
+		chord := NewChord(G, MinorMajor7)
+		require.Equal(t, []Note{G, ASharp, D, FSharp}, chord.Notes())
+	})
+}

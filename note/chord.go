@@ -93,3 +93,13 @@ func (c Chord) Name() ChordName {
 
 	return c.name
 }
+
+// Notes returns the notes that make up the chord. The first note is the root note. The notes are
+// listed in ascending order. If the chord is invalid, this returns an empty list.
+func (c Chord) Notes() []Note {
+	if !c.Valid() {
+		return nil
+	}
+
+	return c.notes
+}
