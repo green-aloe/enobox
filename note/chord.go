@@ -84,3 +84,12 @@ func (c Chord) Root() Note {
 
 	return c.root
 }
+
+// Name returns the name of the chord. If the chord is invalid, this returns an empty value.
+func (c Chord) Name() ChordName {
+	if !c.Valid() {
+		return ChordName("")
+	}
+
+	return c.name
+}

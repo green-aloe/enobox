@@ -203,3 +203,22 @@ func Test_Chord_Root(t *testing.T) {
 		require.Equal(t, G, chord.Root())
 	})
 }
+
+// Test_Chord_Name tests that Chord's Name method returns the correct chord name, or an empty name
+// if the chord is invalid.
+func Test_Chord_Name(t *testing.T) {
+	t.Run("empty", func(t *testing.T) {
+		var chord Chord
+		require.Zero(t, chord.Name())
+	})
+
+	t.Run("invalid", func(t *testing.T) {
+		chord := Chord{Note("asdlkfj"), Major, []Note{A, B, C}}
+		require.Zero(t, chord.Name())
+	})
+
+	t.Run("valid", func(t *testing.T) {
+		chord := NewChord(G, MinorMajor7)
+		require.Equal(t, MinorMajor7, chord.Name())
+	})
+}
