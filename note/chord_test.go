@@ -74,17 +74,17 @@ func Test_ChordName_Valid(t *testing.T) {
 // Test_NewChord tests that NewChord builds the correct chord depending on the root note and chord name.
 func Test_NewChord(t *testing.T) {
 	t.Run("invalid root", func(t *testing.T) {
-		require.Equal(t, Chord{}, NewChord(Note(""), Major))
-		require.Equal(t, Chord{}, NewChord(Note("Z"), Major))
+		require.Zero(t, NewChord(Note(""), Major))
+		require.Zero(t, NewChord(Note("Z"), Major))
 	})
 
 	t.Run("invalid chord", func(t *testing.T) {
-		require.Equal(t, Chord{}, NewChord(C, ChordName("")))
-		require.Equal(t, Chord{}, NewChord(C, ChordName("invalid")))
+		require.Zero(t, NewChord(C, ChordName("")))
+		require.Zero(t, NewChord(C, ChordName("invalid")))
 	})
 
 	t.Run("invalid root and chord", func(t *testing.T) {
-		require.Equal(t, Chord{}, NewChord(A+B, Major+Minor))
+		require.Zero(t, NewChord(A+B, Major+Minor))
 	})
 
 	t.Run("valid", func(t *testing.T) {
@@ -108,7 +108,7 @@ func Test_NewChord(t *testing.T) {
 	})
 }
 
-// Test_Chord_Valid tests that Chord's Valid method XXX
+// Test_Chord_Valid tests that Chord's Valid method correctly reports if a chord is valid.
 func Test_Chord_Valid(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
 		require.False(t, Chord{}.Valid())
@@ -154,5 +154,33 @@ func Test_Chord_Valid(t *testing.T) {
 		require.True(t, Chord{G, MinorMajor7, []Note{G, A, B, C}}.Valid())
 		require.True(t, Chord{FSharp, Minor7, []Note{FSharp, A, CSharp, E}}.Valid())
 		require.True(t, NewChord(BFlat, Dom7).Valid())
+	})
+}
+
+// Test_Chord_String tests that Chord's String method returns the correct string representation of
+// the chord.
+func Test_Chord_String(t *testing.T) {
+	t.Run("invalid chord", func(t *testing.T) {
+		require.Equal(t, "invalid chord", Chord{A, Major, nil}.String())
+	})
+
+	t.Run("valid chord", func(t *testing.T) {
+		require.Equal(t, "Cmaj", NewChord(C, Major).String())
+		require.Equal(t, "C♯maj6", NewChord(CSharp, Major6).String())
+		require.Equal(t, "D♭dom7", NewChord(DFlat, Dom7).String())
+		require.Equal(t, "Dmaj7", NewChord(D, Major7).String())
+		require.Equal(t, "D♯aug", NewChord(DSharp, Augmented).String())
+		require.Equal(t, "E♭aug7", NewChord(EFlat, Augmented7).String())
+		require.Equal(t, "Emin", NewChord(E, Minor).String())
+		require.Equal(t, "Fmin6", NewChord(F, Minor6).String())
+		require.Equal(t, "F♯min7", NewChord(FSharp, Minor7).String())
+		require.Equal(t, "G♭min/maj7", NewChord(GFlat, MinorMajor7).String())
+		require.Equal(t, "Gdim", NewChord(G, Diminished).String())
+		require.Equal(t, "G♯dim7", NewChord(GSharp, Diminished7).String())
+		require.Equal(t, "A♭halfdim7", NewChord(AFlat, HalfDiminished7).String())
+		require.Equal(t, "Amin/maj7", NewChord(A, MinorMajor7).String())
+		require.Equal(t, "A♯dim", NewChord(ASharp, Diminished).String())
+		require.Equal(t, "B♭dim7", NewChord(BFlat, Diminished7).String())
+		require.Equal(t, "Bhalfdim7", NewChord(B, HalfDiminished7).String())
 	})
 }

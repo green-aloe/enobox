@@ -16,6 +16,7 @@ const (
 	HalfDiminished7 ChordName = "halfdim7" // Half-diminished seventh chord
 )
 
+// A chord name is a pre-defined name of a chord.
 type ChordName string
 
 // Valid reports if the chord name is valid.
@@ -65,6 +66,8 @@ func (c Chord) Valid() bool {
 	return true
 }
 
+// String returns the string representation of the chord. If the chord is invalid, this returns
+// "invalid chord".
 func (c Chord) String() string {
 	if !c.Valid() {
 		return "invalid chord"
