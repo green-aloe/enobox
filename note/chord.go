@@ -75,3 +75,12 @@ func (c Chord) String() string {
 
 	return string(c.root) + string(c.name)
 }
+
+// Root returns the root note of the chord. If the chord is invalid, this returns an empty value.
+func (c Chord) Root() Note {
+	if !c.Valid() {
+		return Note("")
+	}
+
+	return c.root
+}

@@ -184,3 +184,22 @@ func Test_Chord_String(t *testing.T) {
 		require.Equal(t, "Bhalfdim7", NewChord(B, HalfDiminished7).String())
 	})
 }
+
+// Test_Chord_Root tests that Chord's Root method returns the correct root note, or an empty note if
+// the chord is invalid.
+func Test_Chord_Root(t *testing.T) {
+	t.Run("empty", func(t *testing.T) {
+		var chord Chord
+		require.Zero(t, chord.Root())
+	})
+
+	t.Run("invalid", func(t *testing.T) {
+		chord := Chord{Note("asdlkfj"), Major, []Note{A, B, C}}
+		require.Zero(t, chord.Root())
+	})
+
+	t.Run("valid", func(t *testing.T) {
+		chord := NewChord(G, MinorMajor7)
+		require.Equal(t, G, chord.Root())
+	})
+}
