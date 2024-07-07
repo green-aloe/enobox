@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type ctxKey int
+
 func Test_AddDecorator(t *testing.T) {
 	defer func() {
 		decorators = nil
@@ -30,15 +32,15 @@ func Test_AddDecorator(t *testing.T) {
 	t.Run("concurrent access", func(t *testing.T) {
 		decorators = nil
 
-		type key struct{}
+		var key ctxKey
 
 		var wg sync.WaitGroup
 		for i := 0; i < 1_000; i++ {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
-				AddDecorator(func(Context) context.Context {
-					return context.WithValue(context.Background(), key{}, i)
+				AddDecorator(func(ctx Context) context.Context {
+					return context.WithValue(ctx, key, i)
 				})
 			}(i)
 		}
@@ -46,11 +48,11 @@ func Test_AddDecorator(t *testing.T) {
 		wg.Wait()
 		require.Len(t, decorators, 1_000)
 
-		ints := make([]int, 1_000)
+		ints := make([]int, len(decorators))
 		for i, decorator := range decorators {
 			ctx := decorator(Context{})
 			require.NotNil(t, ctx)
-			v := ctx.Value(key{})
+			v := ctx.Value(key)
 			ints[i] = v.(int)
 		}
 		sort.Ints(ints)
@@ -86,18 +88,18 @@ func Test_NewContext(t *testing.T) {
 			decorators = nil
 		}()
 
-		type (
-			key1 struct{}
-			key2 struct{}
-			key3 struct{}
-			key4 struct{}
+		const (
+			key1 ctxKey = iota + 1
+			key2
+			key3
+			key4
 		)
 
 		AddDecorator(func(ctx Context) context.Context {
-			return context.WithValue(ctx, key1{}, "value1")
+			return context.WithValue(ctx, key1, "value1")
 		})
 		AddDecorator(func(ctx Context) context.Context {
-			return context.WithValue(ctx, key4{}, "value4")
+			return context.WithValue(ctx, key4, "value4")
 		})
 		AddDecorator(func(ctx Context) context.Context {
 			return nil
@@ -107,16 +109,16 @@ func Test_NewContext(t *testing.T) {
 			return ctx
 		})
 		AddDecorator(func(ctx Context) context.Context {
-			return context.WithValue(ctx, key2{}, "value2")
+			return context.WithValue(ctx, key2, "value2")
 		})
 
 		ctx := NewContext()
 		require.Equal(t, NewTime(), ctx.Time())
 		require.Equal(t, 123, ctx.SampleRate())
-		require.Equal(t, "value1", ctx.Value(key1{}))
-		require.Equal(t, "value2", ctx.Value(key2{}))
-		require.Nil(t, ctx.Value(key3{}))
-		require.Equal(t, "value4", ctx.Value(key4{}))
+		require.Equal(t, "value1", ctx.Value(key1))
+		require.Equal(t, "value2", ctx.Value(key2))
+		require.Nil(t, ctx.Value(key3))
+		require.Equal(t, "value4", ctx.Value(key4))
 	})
 }
 
@@ -266,26 +268,26 @@ func Test_Context_NyqistFrequency(t *testing.T) {
 // Test_Context_Value tests that Context's Value method returns the correct value from a context and
 // handles missing values and bad configurations correctly.
 func Test_Context_Value(t *testing.T) {
-	type contextKeyTest struct{}
+	var testKey ctxKey
 
 	t.Run("nil pointer", func(t *testing.T) {
 		var ctx *Context
-		require.Panics(t, func() { ctx.Value(contextKeyTest{}) })
+		require.Panics(t, func() { ctx.Value(testKey) })
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
 		var ctx Context
-		require.Panics(t, func() { ctx.Value(contextKeyTest{}) })
+		require.Panics(t, func() { ctx.Value(testKey) })
 	})
 
 	t.Run("missing key", func(t *testing.T) {
 		ctx := NewContext()
-		require.Nil(t, ctx.Value(contextKeyTest{}))
+		require.Nil(t, ctx.Value(testKey))
 	})
 
 	t.Run("initialized", func(t *testing.T) {
 		ctx := NewContext()
-		ctx.Context = context.WithValue(ctx, contextKeyTest{}, "test")
-		require.Equal(t, "test", ctx.Value(contextKeyTest{}))
+		ctx.Context = context.WithValue(ctx, testKey, "test")
+		require.Equal(t, "test", ctx.Value(testKey))
 	})
 }
