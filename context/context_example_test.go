@@ -8,13 +8,15 @@ import (
 )
 
 func ExampleAddDecorator() {
-	type ctxKeyMinFreq struct{}
+	type ctxKey struct{}
+	var minFreqKey ctxKey
+
 	context.AddDecorator(func(ctx context.Context) gocontext.Context {
-		return gocontext.WithValue(ctx, ctxKeyMinFreq{}, 22.22)
+		return gocontext.WithValue(ctx, minFreqKey, 22.22)
 	})
 
 	ctx := context.NewContext()
-	minFreq := ctx.Value(ctxKeyMinFreq{})
+	minFreq := ctx.Value(minFreqKey)
 
 	fmt.Println(minFreq)
 
