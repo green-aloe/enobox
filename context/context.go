@@ -35,25 +35,44 @@ func AddDecorator(decorator Decorator) {
 	decorators = append(decorators, decorator)
 }
 
-// NewContext sets up and returns a context for a single sample of audio.
+// NewContext sets up and returns a context for a single sample of audio using default/global values.
 func NewContext() Context {
-	sampleRate := SampleRate()
-	ctx := Context{
-		Context:    context.Background(),
-		time:       NewTimeWith(sampleRate),
-		sampleRate: sampleRate,
+	return NewContextWith(ContextOptions{})
+}
+
+// ContextOptions is the set of configurations that can be used when building a new custom context.
+type ContextOptions struct {
+	Time       Time
+	SampleRate int
+	Decorators []Decorator
+}
+
+// NewContextWith sets up and returns a context for a single sample of audio using the options
+// provided. If a necessary option is not set, the default/global value is used. Any decorators
+// provided are run after the global decorators set with AddDecorator.
+func NewContextWith(options ContextOptions) Context {
+	if options.SampleRate <= 0 {
+		options.SampleRate = SampleRate()
+	}
+	if options.Time == (Time{}) {
+		options.Time = NewTimeWith(options.SampleRate)
 	}
 
-	if len(decorators) > 0 {
-		decoratorsMutex.RLock()
-		defer decoratorsMutex.RUnlock()
+	ctx := Context{
+		Context:    context.Background(),
+		time:       options.Time,
+		sampleRate: options.SampleRate,
+	}
 
+	for _, decorators := range [][]Decorator{decorators, options.Decorators} {
 		for _, decorator := range decorators {
-			if output := decorator(ctx); output != nil {
-				if ectx, ok := output.(Context); ok {
-					ctx = ectx
-				} else {
-					ctx.Context = output
+			if decorator != nil {
+				if output := decorator(ctx); output != nil {
+					if ectx, ok := output.(Context); ok {
+						ctx = ectx
+					} else {
+						ctx.Context = output
+					}
 				}
 			}
 		}
