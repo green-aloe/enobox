@@ -37,6 +37,31 @@ func ExampleNewContext() {
 	// 44100
 }
 
+func ExampleNewContextWith() {
+	ctx := context.NewContextWith(context.ContextOptions{})
+	time := ctx.Time()
+	sampleRate := ctx.SampleRate()
+
+	fmt.Println(time)
+	fmt.Println(sampleRate)
+
+	ctx = context.NewContextWith(context.ContextOptions{
+		Time:       context.NewTimeWith(35_000).ShiftBy(400),
+		SampleRate: 35_000,
+	})
+	time = ctx.Time()
+	sampleRate = ctx.SampleRate()
+
+	fmt.Println(time)
+	fmt.Println(sampleRate)
+
+	// Output:
+	// 0 seconds, sample 1/44100
+	// 44100
+	// 0 seconds, sample 401/35000
+	// 35000
+}
+
 func ExampleContext_Time() {
 	ctx := context.NewContext()
 	time := ctx.Time()
