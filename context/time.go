@@ -158,3 +158,8 @@ func (t Time) String() string {
 
 	return s
 }
+
+// Empty checks if the timestamp is the zero value.
+func (t Time) Empty() bool {
+	return t == Time{}
+}
