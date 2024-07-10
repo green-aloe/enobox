@@ -122,6 +122,102 @@ func Test_NewContext(t *testing.T) {
 	})
 }
 
+// Test_NewContextWith tests that NewContextWith returns a Context that has been initialized
+// correctly with the provided configuration.
+func Test_NewContextWith(t *testing.T) {
+	t.Run("types", func(t *testing.T) {
+		ctx := NewContextWith(ContextOptions{})
+		require.NotEmpty(t, ctx)
+
+		require.IsType(t, Context{}, ctx)
+
+		rt := reflect.TypeOf(&ctx)
+		ri := reflect.TypeOf((*context.Context)(nil)).Elem()
+		require.True(t, rt.Implements(ri))
+	})
+
+	t.Run("default values", func(t *testing.T) {
+		ctx := NewContextWith(ContextOptions{})
+		require.Equal(t, NewTime(), ctx.Time())
+		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
+		require.IsType(t, context.Background(), ctx.Context)
+	})
+
+	t.Run("configured values", func(t *testing.T) {
+		ctx := NewContextWith(ContextOptions{
+			Time:       NewTimeWith(100).ShiftBy(123),
+			SampleRate: 999,
+		})
+		require.Equal(t, 1, ctx.Time().Second())
+		require.Equal(t, 24, ctx.Time().Sample())
+		require.Equal(t, 100, ctx.Time().SampleRate())
+		require.Equal(t, 999, ctx.SampleRate())
+		require.IsType(t, context.Background(), ctx.Context)
+	})
+
+	t.Run("decorators", func(t *testing.T) {
+		decorators = nil
+		defer func() {
+			decorators = nil
+		}()
+
+		const (
+			key1 ctxKey = iota + 1
+			key2
+			key3
+			key4
+			key5
+			key6
+		)
+
+		AddDecorator(func(ctx Context) context.Context {
+			return context.WithValue(ctx, key1, "value1")
+		})
+		AddDecorator(func(ctx Context) context.Context {
+			return context.WithValue(ctx, key4, "value4")
+		})
+		AddDecorator(func(ctx Context) context.Context {
+			return nil
+		})
+		AddDecorator(func(ctx Context) context.Context {
+			ctx.SetSampleRate(123)
+			return ctx
+		})
+		AddDecorator(func(ctx Context) context.Context {
+			return context.WithValue(ctx, key2, "value2")
+		})
+
+		ctx := NewContextWith(ContextOptions{
+			Decorators: []Decorator{
+				func(ctx Context) context.Context {
+					return context.WithValue(ctx, key4, "value44")
+				},
+				func(ctx Context) context.Context {
+					return nil
+				},
+				func(ctx Context) context.Context {
+					return context.WithValue(ctx, key5, "value5")
+				},
+				func(ctx Context) context.Context {
+					return context.WithValue(ctx, key6, "value6")
+				},
+				func(ctx Context) context.Context {
+					ctx.SetSampleRate(456)
+					return ctx
+				},
+			},
+		})
+		require.Equal(t, NewTime(), ctx.Time())
+		require.Equal(t, 456, ctx.SampleRate())
+		require.Equal(t, "value1", ctx.Value(key1))
+		require.Equal(t, "value2", ctx.Value(key2))
+		require.Nil(t, ctx.Value(key3))
+		require.Equal(t, "value44", ctx.Value(key4))
+		require.Equal(t, "value5", ctx.Value(key5))
+		require.Equal(t, "value6", ctx.Value(key6))
+	})
+}
+
 // Test_Context_Time tests that Context's Time method returns the correct timestamp.
 func Test_Context_Time(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
