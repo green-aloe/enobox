@@ -280,7 +280,7 @@ func Test_Time_Equal(t *testing.T) {
 		require.True(t, time2.Equal(time1))
 	})
 
-	t.Run("non-empty", func(t *testing.T) {
+	t.Run("not empty", func(t *testing.T) {
 		time1 := Time{111, 2222, 44_100}
 		time2 := Time{111, 2222, 44_100}
 		require.True(t, time1.Equal(time2))
@@ -443,4 +443,26 @@ func Test_Time_String(t *testing.T) {
 			require.Equal(t, subtest.want, subtest.time.String())
 		})
 	}
+}
+
+// Test_Time_Empty tests that Time's Empty method correctly determines when a timestamp is empty.
+func Test_Time_Empty(t *testing.T) {
+	t.Run("empty", func(t *testing.T) {
+		var time Time
+		require.True(t, time.Empty())
+	})
+
+	t.Run("not empty", func(t *testing.T) {
+		time := NewTime()
+		require.False(t, time.Empty())
+
+		time = time.Decrement()
+		require.False(t, time.Empty())
+
+		time = NewTimeWith(44_100)
+		require.False(t, time.Empty())
+
+		time = time.ShiftBy(-44_100)
+		require.False(t, time.Empty())
+	})
 }
