@@ -100,28 +100,12 @@ func ExampleContext_SampleRate() {
 	// 44100
 }
 
-func ExampleContext_SetSampleRate() {
-	ctx := context.NewContext()
-	sampleRate1 := ctx.SampleRate()
-
-	ctx.SetSampleRate(48_000)
-	sampleRate2 := ctx.SampleRate()
-
-	fmt.Println(sampleRate1, sampleRate2)
-
-	// Output:
-	// 44100 48000
-}
-
 func ExampleContext_NyqistFrequency() {
 	ctx := context.NewContext()
-	nyquistFreq1 := ctx.NyqistFrequency()
+	nyquistFreq := ctx.NyqistFrequency()
 
-	ctx.SetSampleRate(48_000)
-	nyquistFreq2 := ctx.NyqistFrequency()
-
-	fmt.Println(nyquistFreq1, nyquistFreq2)
+	fmt.Println(nyquistFreq)
 
 	// Output:
-	// 22050 24000
+	// 22050
 }
