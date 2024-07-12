@@ -105,7 +105,7 @@ func Test_NewContext(t *testing.T) {
 			return nil
 		})
 		AddDecorator(func(ctx Context) context.Context {
-			ctx.SetSampleRate(123)
+			ctx.SetTime(NewTimeWith(123))
 			return ctx
 		})
 		AddDecorator(func(ctx Context) context.Context {
@@ -113,8 +113,10 @@ func Test_NewContext(t *testing.T) {
 		})
 
 		ctx := NewContext()
-		require.Equal(t, NewTime(), ctx.Time())
-		require.Equal(t, 123, ctx.SampleRate())
+		require.Equal(t, 0, ctx.Time().Second())
+		require.Equal(t, 1, ctx.Time().Sample())
+		require.Equal(t, 123, ctx.Time().SampleRate())
+		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
 		require.Equal(t, "value1", ctx.Value(key1))
 		require.Equal(t, "value2", ctx.Value(key2))
 		require.Nil(t, ctx.Value(key3))
@@ -180,7 +182,7 @@ func Test_NewContextWith(t *testing.T) {
 			return nil
 		})
 		AddDecorator(func(ctx Context) context.Context {
-			ctx.SetSampleRate(123)
+			ctx.SetTime(NewTimeWith(123))
 			return ctx
 		})
 		AddDecorator(func(ctx Context) context.Context {
@@ -202,13 +204,15 @@ func Test_NewContextWith(t *testing.T) {
 					return context.WithValue(ctx, key6, "value6")
 				},
 				func(ctx Context) context.Context {
-					ctx.SetSampleRate(456)
+					ctx.SetTime(NewTimeWith(456))
 					return ctx
 				},
 			},
 		})
-		require.Equal(t, NewTime(), ctx.Time())
-		require.Equal(t, 456, ctx.SampleRate())
+		require.Equal(t, 0, ctx.Time().Second())
+		require.Equal(t, 1, ctx.Time().Sample())
+		require.Equal(t, 456, ctx.Time().SampleRate())
+		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
 		require.Equal(t, "value1", ctx.Value(key1))
 		require.Equal(t, "value2", ctx.Value(key2))
 		require.Nil(t, ctx.Value(key3))
@@ -311,31 +315,6 @@ func Test_Context_SampleRate(t *testing.T) {
 		SetSampleRate(100)
 		require.Equal(t, 44100, ctx.SampleRate())
 		require.Equal(t, 100, SampleRate())
-	})
-}
-
-// Test_Context_SetSampleRate tests that Context's SetSampleRate method sets the correct sample rate
-// in the context.
-func Test_Context_SetSampleRate(t *testing.T) {
-	require.Equal(t, 44_100, SampleRate())
-	defer SetSampleRate(DefaultSampleRate)
-
-	t.Run("nil pointer", func(t *testing.T) {
-		var ctx *Context
-		ctx.SetSampleRate(10)
-		require.Zero(t, ctx.SampleRate())
-	})
-
-	t.Run("uninitialized", func(t *testing.T) {
-		var ctx Context
-		ctx.SetSampleRate(10)
-		require.Equal(t, 10, ctx.SampleRate())
-	})
-
-	t.Run("initialized", func(t *testing.T) {
-		ctx := NewContext()
-		ctx.SetSampleRate(10)
-		require.Equal(t, 10, ctx.SampleRate())
 	})
 }
 
