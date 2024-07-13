@@ -81,6 +81,15 @@ func NewContextWith(options ContextOptions) Context {
 	return ctx
 }
 
+// SetValue sets the key-value pair in the context.
+func (ctx *Context) SetValue(key, value any) {
+	if ctx == nil {
+		return
+	}
+
+	ctx.Context = context.WithValue(ctx.Context, key, value)
+}
+
 // Time returns the context's internal timestamp.
 func (ctx *Context) Time() Time {
 	if ctx == nil {
