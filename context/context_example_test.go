@@ -62,6 +62,17 @@ func ExampleNewContextWith() {
 	// 35000
 }
 
+func ExampleContext_SetValue() {
+	ctx := context.NewContext()
+	ctx.SetValue("key", "value")
+	value := ctx.Value("key")
+
+	fmt.Println(value)
+
+	// Output:
+	// value
+}
+
 func ExampleContext_Time() {
 	ctx := context.NewContext()
 	time := ctx.Time()
