@@ -81,9 +81,10 @@ func NewContextWith(options ContextOptions) Context {
 	return ctx
 }
 
-// SetValue sets the key-value pair in the context.
+// SetValue sets an arbitrary value in the context under the provided key. The key should follow the
+// same general guidelines for context.WithValue.
 func (ctx *Context) SetValue(key, value any) {
-	if ctx == nil {
+	if ctx == nil || ctx.Context == nil {
 		return
 	}
 
