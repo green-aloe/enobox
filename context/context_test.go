@@ -222,6 +222,44 @@ func Test_NewContextWith(t *testing.T) {
 	})
 }
 
+// Test_Context_SetValue tests that Context's SetValue method sets the correct value in the context.
+func Test_Context_SetValue(t *testing.T) {
+	t.Run("nil pointer", func(t *testing.T) {
+		var ctx *Context
+		require.NotPanics(t, func() { ctx.SetValue("key", "value") })
+	})
+
+	t.Run("uninitialized", func(t *testing.T) {
+		var ctx Context
+		require.NotPanics(t, func() { ctx.SetValue("key", "value") })
+	})
+
+	t.Run("initialized", func(t *testing.T) {
+		ctx := NewContext()
+		ctx.SetValue("key", "value")
+		require.Equal(t, "value", ctx.Value("key"))
+	})
+
+	t.Run("overwrite", func(t *testing.T) {
+		ctx := NewContext()
+		ctx.SetValue("key", "value1")
+		ctx.SetValue("key", "value2")
+		require.Equal(t, "value2", ctx.Value("key"))
+	})
+
+	t.Run("nil key", func(t *testing.T) {
+		ctx := NewContext()
+		require.Panics(t, func() { ctx.SetValue(nil, "value") })
+		require.Nil(t, ctx.Value("key"))
+	})
+
+	t.Run("nil value", func(t *testing.T) {
+		ctx := NewContext()
+		ctx.SetValue("key", nil)
+		require.Nil(t, ctx.Value("key"))
+	})
+}
+
 // Test_Context_Time tests that Context's Time method returns the correct timestamp.
 func Test_Context_Time(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
@@ -362,7 +400,7 @@ func Test_Context_Value(t *testing.T) {
 
 	t.Run("initialized", func(t *testing.T) {
 		ctx := NewContext()
-		ctx.Context = context.WithValue(ctx, testKey, "test")
+		ctx.SetValue(testKey, "test")
 		require.Equal(t, "test", ctx.Value(testKey))
 	})
 }
