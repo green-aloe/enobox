@@ -64,12 +64,17 @@ func ExampleNewContextWith() {
 
 func ExampleContext_SetValue() {
 	ctx := context.NewContext()
-	ctx.SetValue("key", "value")
 	value := ctx.Value("key")
 
 	fmt.Println(value)
 
+	ctx.SetValue("key", "value")
+	value = ctx.Value("key")
+
+	fmt.Println(value)
+
 	// Output:
+	// <nil>
 	// value
 }
 
