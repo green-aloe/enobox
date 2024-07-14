@@ -14,7 +14,7 @@ type Context struct {
 }
 
 // A Decorator modifies a context.
-type Decorator func(Context) context.Context
+type Decorator func(Context) Context
 
 var (
 	decorators      []Decorator
@@ -67,13 +67,7 @@ func NewContextWith(options ContextOptions) Context {
 	for _, decorators := range [][]Decorator{decorators, options.Decorators} {
 		for _, decorator := range decorators {
 			if decorator != nil {
-				if output := decorator(ctx); output != nil {
-					if ectx, ok := output.(Context); ok {
-						ctx = ectx
-					} else {
-						ctx.Context = output
-					}
-				}
+				ctx = decorator(ctx)
 			}
 		}
 	}
