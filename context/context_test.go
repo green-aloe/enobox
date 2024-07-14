@@ -25,7 +25,7 @@ func Test_AddDecorator(t *testing.T) {
 
 	t.Run("non-nil decorator", func(t *testing.T) {
 		require.Len(t, decorators, 0)
-		AddDecorator(func(ctx Context) context.Context { return ctx })
+		AddDecorator(func(ctx Context) Context { return ctx })
 		require.Len(t, decorators, 1)
 	})
 
@@ -39,8 +39,9 @@ func Test_AddDecorator(t *testing.T) {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
-				AddDecorator(func(ctx Context) context.Context {
-					return context.WithValue(ctx, key, i)
+				AddDecorator(func(ctx Context) Context {
+					ctx.SetValue(key, i)
+					return ctx
 				})
 			}(i)
 		}
@@ -48,9 +49,10 @@ func Test_AddDecorator(t *testing.T) {
 		wg.Wait()
 		require.Len(t, decorators, 1_000)
 
+		ctx := Context{Context: context.Background()}
 		ints := make([]int, len(decorators))
 		for i, decorator := range decorators {
-			ctx := decorator(Context{})
+			ctx := decorator(ctx)
 			require.NotNil(t, ctx)
 			v := ctx.Value(key)
 			ints[i] = v.(int)
@@ -95,21 +97,22 @@ func Test_NewContext(t *testing.T) {
 			key4
 		)
 
-		AddDecorator(func(ctx Context) context.Context {
-			return context.WithValue(ctx, key1, "value1")
+		AddDecorator(func(ctx Context) Context {
+			ctx.SetValue(key1, "value1")
+			return ctx
 		})
-		AddDecorator(func(ctx Context) context.Context {
-			return context.WithValue(ctx, key4, "value4")
+		AddDecorator(func(ctx Context) Context {
+			ctx.SetValue(key4, "value4")
+			return ctx
 		})
-		AddDecorator(func(ctx Context) context.Context {
-			return nil
-		})
-		AddDecorator(func(ctx Context) context.Context {
+		AddDecorator(nil)
+		AddDecorator(func(ctx Context) Context {
 			ctx.SetTime(NewTimeWith(123))
 			return ctx
 		})
-		AddDecorator(func(ctx Context) context.Context {
-			return context.WithValue(ctx, key2, "value2")
+		AddDecorator(func(ctx Context) Context {
+			ctx.SetValue(key2, "value2")
+			return ctx
 		})
 
 		ctx := NewContext()
@@ -172,38 +175,40 @@ func Test_NewContextWith(t *testing.T) {
 			key6
 		)
 
-		AddDecorator(func(ctx Context) context.Context {
-			return context.WithValue(ctx, key1, "value1")
+		AddDecorator(func(ctx Context) Context {
+			ctx.SetValue(key1, "value1")
+			return ctx
 		})
-		AddDecorator(func(ctx Context) context.Context {
-			return context.WithValue(ctx, key4, "value4")
+		AddDecorator(func(ctx Context) Context {
+			ctx.SetValue(key4, "value4")
+			return ctx
 		})
-		AddDecorator(func(ctx Context) context.Context {
-			return nil
-		})
-		AddDecorator(func(ctx Context) context.Context {
+		AddDecorator(nil)
+		AddDecorator(func(ctx Context) Context {
 			ctx.SetTime(NewTimeWith(123))
 			return ctx
 		})
-		AddDecorator(func(ctx Context) context.Context {
-			return context.WithValue(ctx, key2, "value2")
+		AddDecorator(func(ctx Context) Context {
+			ctx.SetValue(key2, "value2")
+			return ctx
 		})
 
 		ctx := NewContextWith(ContextOptions{
 			Decorators: []Decorator{
-				func(ctx Context) context.Context {
-					return context.WithValue(ctx, key4, "value44")
+				func(ctx Context) Context {
+					ctx.SetValue(key4, "value44")
+					return ctx
 				},
-				func(ctx Context) context.Context {
-					return nil
+				nil,
+				func(ctx Context) Context {
+					ctx.SetValue(key5, "value5")
+					return ctx
 				},
-				func(ctx Context) context.Context {
-					return context.WithValue(ctx, key5, "value5")
+				func(ctx Context) Context {
+					ctx.SetValue(key6, "value6")
+					return ctx
 				},
-				func(ctx Context) context.Context {
-					return context.WithValue(ctx, key6, "value6")
-				},
-				func(ctx Context) context.Context {
+				func(ctx Context) Context {
 					ctx.SetTime(NewTimeWith(456))
 					return ctx
 				},
