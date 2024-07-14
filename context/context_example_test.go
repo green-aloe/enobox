@@ -1,7 +1,6 @@
 package context_test
 
 import (
-	gocontext "context"
 	"fmt"
 
 	"github.com/green-aloe/enobox/context"
@@ -11,8 +10,9 @@ func ExampleAddDecorator() {
 	type ctxKey struct{}
 	var minFreqKey ctxKey
 
-	context.AddDecorator(func(ctx context.Context) gocontext.Context {
-		return gocontext.WithValue(ctx, minFreqKey, 22.22)
+	context.AddDecorator(func(ctx context.Context) context.Context {
+		ctx.SetValue(minFreqKey, 22.22)
+		return ctx
 	})
 
 	ctx := context.NewContext()
@@ -41,25 +41,37 @@ func ExampleNewContextWith() {
 	ctx := context.NewContextWith(context.ContextOptions{})
 	time := ctx.Time()
 	sampleRate := ctx.SampleRate()
+	value := ctx.Value("key")
 
 	fmt.Println(time)
 	fmt.Println(sampleRate)
+	fmt.Println(value)
 
 	ctx = context.NewContextWith(context.ContextOptions{
 		Time:       context.NewTimeWith(35_000).ShiftBy(400),
 		SampleRate: 35_000,
+		Decorators: []context.Decorator{
+			func(ctx context.Context) context.Context {
+				ctx.SetValue("key", "value")
+				return ctx
+			},
+		},
 	})
 	time = ctx.Time()
 	sampleRate = ctx.SampleRate()
+	value = ctx.Value("key")
 
 	fmt.Println(time)
 	fmt.Println(sampleRate)
+	fmt.Println(value)
 
 	// Output:
 	// 0 seconds, sample 1/44100
 	// 44100
+	// <nil>
 	// 0 seconds, sample 401/35000
 	// 35000
+	// value
 }
 
 func ExampleContext_SetValue() {
