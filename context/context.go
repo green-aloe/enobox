@@ -1,16 +1,18 @@
 package context
 
 import (
-	"context"
+	gocontext "context"
 	"sync"
 )
 
-// Context holds the context for a single sample of audio.
-type Context struct {
-	context.Context
-
-	time       Time
-	sampleRate int
+// A Context holds the context for a single sample of audio.
+type Context interface {
+	gocontext.Context
+	SetValue(key, value any)
+	Time() Time
+	SetTime(time Time)
+	SampleRate() int
+	NyqistFrequency() float32
 }
 
 // A Decorator modifies a context.
@@ -33,6 +35,14 @@ func AddDecorator(decorator Decorator) {
 	defer decoratorsMutex.Unlock()
 
 	decorators = append(decorators, decorator)
+}
+
+// context is the internal implementation of Context.
+type context struct {
+	gocontext.Context
+
+	time       Time
+	sampleRate int
 }
 
 // NewContext sets up and returns a context for a single sample of audio using default/global values.
@@ -58,8 +68,8 @@ func NewContextWith(options ContextOptions) Context {
 		options.Time = NewTimeWith(options.SampleRate)
 	}
 
-	ctx := Context{
-		Context:    context.Background(),
+	var ctx Context = &context{
+		Context:    gocontext.Background(),
 		time:       options.Time,
 		sampleRate: options.SampleRate,
 	}
@@ -67,7 +77,9 @@ func NewContextWith(options ContextOptions) Context {
 	for _, decorators := range [][]Decorator{decorators, options.Decorators} {
 		for _, decorator := range decorators {
 			if decorator != nil {
-				ctx = decorator(ctx)
+				if output := decorator(ctx); output != nil {
+					ctx = output
+				}
 			}
 		}
 	}
@@ -77,16 +89,16 @@ func NewContextWith(options ContextOptions) Context {
 
 // SetValue sets an arbitrary value in the context under the provided key. The key should follow the
 // same general guidelines for context.WithValue.
-func (ctx *Context) SetValue(key, value any) {
+func (ctx *context) SetValue(key, value any) {
 	if ctx == nil || ctx.Context == nil {
 		return
 	}
 
-	ctx.Context = context.WithValue(ctx.Context, key, value)
+	ctx.Context = gocontext.WithValue(ctx.Context, key, value)
 }
 
 // Time returns the context's internal timestamp.
-func (ctx *Context) Time() Time {
+func (ctx *context) Time() Time {
 	if ctx == nil {
 		return Time{}
 	}
@@ -95,7 +107,7 @@ func (ctx *Context) Time() Time {
 }
 
 // SetTime sets the context's internal timestamp.
-func (ctx *Context) SetTime(time Time) {
+func (ctx *context) SetTime(time Time) {
 	if ctx == nil {
 		return
 	}
@@ -104,7 +116,7 @@ func (ctx *Context) SetTime(time Time) {
 }
 
 // SampleRate returns the sample rate for this context.
-func (ctx *Context) SampleRate() int {
+func (ctx *context) SampleRate() int {
 	if ctx == nil {
 		return 0
 	}
@@ -113,6 +125,6 @@ func (ctx *Context) SampleRate() int {
 }
 
 // NyqistFrequency returns the maximum frequency that should be used with this context's sample rate.
-func (ctx *Context) NyqistFrequency() float32 {
+func (ctx *context) NyqistFrequency() float32 {
 	return float32(ctx.SampleRate() / 2)
 }
