@@ -1,6 +1,7 @@
 package context_test
 
 import (
+	gocontext "context"
 	"fmt"
 
 	"github.com/green-aloe/enobox/context"
@@ -48,6 +49,7 @@ func ExampleNewContextWith() {
 	fmt.Println(value)
 
 	ctx = context.NewContextWith(context.ContextOptions{
+		Context:    gocontext.WithoutCancel(gocontext.Background()),
 		Time:       context.NewTimeWith(35_000).ShiftBy(400),
 		SampleRate: 35_000,
 		Decorators: []context.Decorator{
