@@ -1,7 +1,7 @@
 package context
 
 import (
-	"context"
+	gocontext "context"
 	"reflect"
 	"sort"
 	"sync"
@@ -12,6 +12,7 @@ import (
 
 type ctxKey int
 
+// Test_AddDecorator tests that AddDecorator adds valid decorators to the list of decorators.
 func Test_AddDecorator(t *testing.T) {
 	defer func() {
 		decorators = nil
@@ -35,21 +36,21 @@ func Test_AddDecorator(t *testing.T) {
 		var key ctxKey
 
 		var wg sync.WaitGroup
-		for i := 0; i < 1_000; i++ {
+		for i := range 1_000 {
 			wg.Add(1)
-			go func(i int) {
+			go func() {
 				defer wg.Done()
 				AddDecorator(func(ctx Context) Context {
 					ctx.SetValue(key, i)
 					return ctx
 				})
-			}(i)
+			}()
 		}
 
 		wg.Wait()
 		require.Len(t, decorators, 1_000)
 
-		ctx := Context{Context: context.Background()}
+		ctx := &context{Context: gocontext.Background()}
 		ints := make([]int, len(decorators))
 		for i, decorator := range decorators {
 			ctx := decorator(ctx)
@@ -58,22 +59,25 @@ func Test_AddDecorator(t *testing.T) {
 			ints[i] = v.(int)
 		}
 		sort.Ints(ints)
-		for i, v := range ints {
-			require.Equal(t, i, v)
+		for i, n := range ints {
+			require.Equal(t, i, n)
 		}
 	})
 }
 
-// Test_NewContext tests that NewContext returns a Context that has been initialized correctly.
+// Test_NewContext tests that NewContext returns a Context that has been initialized correctly with
+// the default values.
 func Test_NewContext(t *testing.T) {
 	t.Run("types", func(t *testing.T) {
 		ctx := NewContext()
 		require.NotEmpty(t, ctx)
 
-		require.IsType(t, Context{}, ctx)
+		ectx, ok := ctx.(*context)
+		require.True(t, ok)
+		require.IsType(t, gocontext.Background(), ectx.Context)
 
-		rt := reflect.TypeOf(&ctx)
-		ri := reflect.TypeOf((*context.Context)(nil)).Elem()
+		rt := reflect.TypeOf(ctx)
+		ri := reflect.TypeOf((*gocontext.Context)(nil)).Elem()
 		require.True(t, rt.Implements(ri))
 	})
 
@@ -81,7 +85,6 @@ func Test_NewContext(t *testing.T) {
 		ctx := NewContext()
 		require.Equal(t, NewTime(), ctx.Time())
 		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
-		require.IsType(t, context.Background(), ctx.Context)
 	})
 
 	t.Run("decorators", func(t *testing.T) {
@@ -102,28 +105,30 @@ func Test_NewContext(t *testing.T) {
 			return ctx
 		})
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetValue(key4, "value4")
-			return ctx
-		})
-		AddDecorator(nil)
-		AddDecorator(func(ctx Context) Context {
-			ctx.SetTime(NewTimeWith(123))
+			ctx.SetValue(key4, 4)
 			return ctx
 		})
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetValue(key2, "value2")
+			return nil
+		})
+		AddDecorator(func(ctx Context) Context {
+			ctx.SetTime(NewTimeAt(10, 11, 123))
+			return ctx
+		})
+		AddDecorator(func(ctx Context) Context {
+			ctx.SetValue(key2, '😬')
 			return ctx
 		})
 
 		ctx := NewContext()
-		require.Equal(t, 0, ctx.Time().Second())
-		require.Equal(t, 1, ctx.Time().Sample())
+		require.Equal(t, 10, ctx.Time().Second())
+		require.Equal(t, 11, ctx.Time().Sample())
 		require.Equal(t, 123, ctx.Time().SampleRate())
 		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
 		require.Equal(t, "value1", ctx.Value(key1))
-		require.Equal(t, "value2", ctx.Value(key2))
+		require.Equal(t, '😬', ctx.Value(key2))
 		require.Nil(t, ctx.Value(key3))
-		require.Equal(t, "value4", ctx.Value(key4))
+		require.Equal(t, 4, ctx.Value(key4))
 	})
 }
 
@@ -134,10 +139,12 @@ func Test_NewContextWith(t *testing.T) {
 		ctx := NewContextWith(ContextOptions{})
 		require.NotEmpty(t, ctx)
 
-		require.IsType(t, Context{}, ctx)
+		ectx, ok := ctx.(*context)
+		require.True(t, ok)
+		require.IsType(t, gocontext.Background(), ectx.Context)
 
-		rt := reflect.TypeOf(&ctx)
-		ri := reflect.TypeOf((*context.Context)(nil)).Elem()
+		rt := reflect.TypeOf(ctx)
+		ri := reflect.TypeOf((*gocontext.Context)(nil)).Elem()
 		require.True(t, rt.Implements(ri))
 	})
 
@@ -145,7 +152,6 @@ func Test_NewContextWith(t *testing.T) {
 		ctx := NewContextWith(ContextOptions{})
 		require.Equal(t, NewTime(), ctx.Time())
 		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
-		require.IsType(t, context.Background(), ctx.Context)
 	})
 
 	t.Run("configured values", func(t *testing.T) {
@@ -157,7 +163,6 @@ func Test_NewContextWith(t *testing.T) {
 		require.Equal(t, 24, ctx.Time().Sample())
 		require.Equal(t, 100, ctx.Time().SampleRate())
 		require.Equal(t, 999, ctx.SampleRate())
-		require.IsType(t, context.Background(), ctx.Context)
 	})
 
 	t.Run("decorators", func(t *testing.T) {
@@ -176,16 +181,18 @@ func Test_NewContextWith(t *testing.T) {
 		)
 
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetValue(key1, "value1")
+			ctx.SetValue(key1, uint64(1))
 			return ctx
 		})
 		AddDecorator(func(ctx Context) Context {
 			ctx.SetValue(key4, "value4")
 			return ctx
 		})
-		AddDecorator(nil)
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetTime(NewTimeWith(123))
+			return nil
+		})
+		AddDecorator(func(ctx Context) Context {
+			ctx.SetTime(NewTimeAt(20, 21, 21_000))
 			return ctx
 		})
 		AddDecorator(func(ctx Context) Context {
@@ -196,46 +203,53 @@ func Test_NewContextWith(t *testing.T) {
 		ctx := NewContextWith(ContextOptions{
 			Decorators: []Decorator{
 				func(ctx Context) Context {
-					ctx.SetValue(key4, "value44")
+					return nil
+				},
+				func(ctx Context) Context {
+					ctx.SetValue(key4, "value4444")
 					return ctx
 				},
 				nil,
+				func(ctx Context) Context {
+					ctx.SetTime(NewTimeWith(789))
+					return ctx
+				},
 				func(ctx Context) Context {
 					ctx.SetValue(key5, "value5")
 					return ctx
 				},
 				func(ctx Context) Context {
-					ctx.SetValue(key6, "value6")
+					ctx.SetValue(key6, struct{ int }{10})
 					return ctx
 				},
 				func(ctx Context) Context {
-					ctx.SetTime(NewTimeWith(456))
+					ctx.SetTime(NewTimeAt(90, 99, 999))
 					return ctx
 				},
 			},
 		})
-		require.Equal(t, 0, ctx.Time().Second())
-		require.Equal(t, 1, ctx.Time().Sample())
-		require.Equal(t, 456, ctx.Time().SampleRate())
+		require.Equal(t, 90, ctx.Time().Second())
+		require.Equal(t, 99, ctx.Time().Sample())
+		require.Equal(t, 999, ctx.Time().SampleRate())
 		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
-		require.Equal(t, "value1", ctx.Value(key1))
+		require.Equal(t, uint64(1), ctx.Value(key1))
 		require.Equal(t, "value2", ctx.Value(key2))
 		require.Nil(t, ctx.Value(key3))
-		require.Equal(t, "value44", ctx.Value(key4))
+		require.Equal(t, "value4444", ctx.Value(key4))
 		require.Equal(t, "value5", ctx.Value(key5))
-		require.Equal(t, "value6", ctx.Value(key6))
+		require.Equal(t, struct{ int }{10}, ctx.Value(key6))
 	})
 }
 
 // Test_Context_SetValue tests that Context's SetValue method sets the correct value in the context.
 func Test_Context_SetValue(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
-		var ctx *Context
+		var ctx *context
 		require.NotPanics(t, func() { ctx.SetValue("key", "value") })
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
-		var ctx Context
+		var ctx context
 		require.NotPanics(t, func() { ctx.SetValue("key", "value") })
 	})
 
@@ -268,12 +282,12 @@ func Test_Context_SetValue(t *testing.T) {
 // Test_Context_Time tests that Context's Time method returns the correct timestamp.
 func Test_Context_Time(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
-		var ctx *Context
+		var ctx *context
 		require.Zero(t, ctx.Time())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
-		var ctx Context
+		var ctx context
 		require.Zero(t, ctx.Time())
 	})
 
@@ -281,13 +295,15 @@ func Test_Context_Time(t *testing.T) {
 		ctx := NewContext()
 		require.Equal(t, 0, ctx.Time().Second())
 		require.Equal(t, 1, ctx.Time().Sample())
+		require.Equal(t, DefaultSampleRate, ctx.Time().SampleRate())
 	})
 
 	t.Run("updated", func(t *testing.T) {
 		ctx := NewContext()
-		ctx.time = ctx.Time().ShiftBy(10)
+		ctx.SetTime(ctx.Time().ShiftBy(10))
 		require.Equal(t, 0, ctx.Time().Second())
 		require.Equal(t, 11, ctx.Time().Sample())
+		require.Equal(t, DefaultSampleRate, ctx.Time().SampleRate())
 	})
 
 	t.Run("immutable", func(t *testing.T) {
@@ -305,14 +321,14 @@ func Test_Context_Time(t *testing.T) {
 // context.
 func Test_Context_SetTime(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
-		var ctx *Context
-		ctx.SetTime(Time{10, 20, 44_100})
+		var ctx *context
+		ctx.SetTime(NewTimeAt(10, 20, 44_100))
 		require.Zero(t, ctx.Time())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
-		var ctx Context
-		ctx.SetTime(Time{10, 20, 44_100})
+		var ctx context
+		ctx.SetTime(NewTimeAt(10, 20, 44_100))
 		require.Equal(t, 10, ctx.Time().Second())
 		require.Equal(t, 20, ctx.Time().Sample())
 		require.Equal(t, 44_100, ctx.Time().SampleRate())
@@ -320,7 +336,16 @@ func Test_Context_SetTime(t *testing.T) {
 
 	t.Run("initialized", func(t *testing.T) {
 		ctx := NewContext()
-		ctx.SetTime(Time{10, 20, 100})
+		ctx.SetTime(NewTimeAt(10, 20, 100))
+		require.Equal(t, 10, ctx.Time().Second())
+		require.Equal(t, 20, ctx.Time().Sample())
+		require.Equal(t, 100, ctx.Time().SampleRate())
+	})
+
+	t.Run("overwrite", func(t *testing.T) {
+		ctx := NewContext()
+		ctx.SetTime(NewTimeAt(1, 2, 10))
+		ctx.SetTime(NewTimeAt(10, 20, 100))
 		require.Equal(t, 10, ctx.Time().Second())
 		require.Equal(t, 20, ctx.Time().Sample())
 		require.Equal(t, 100, ctx.Time().SampleRate())
@@ -333,12 +358,12 @@ func Test_Context_SampleRate(t *testing.T) {
 	defer SetSampleRate(DefaultSampleRate)
 
 	t.Run("nil pointer", func(t *testing.T) {
-		var ctx *Context
+		var ctx *context
 		require.Zero(t, ctx.SampleRate())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
-		var ctx Context
+		var ctx context
 		require.Zero(t, ctx.SampleRate())
 	})
 
@@ -348,8 +373,9 @@ func Test_Context_SampleRate(t *testing.T) {
 	})
 
 	t.Run("updated", func(t *testing.T) {
-		ctx := NewContext()
-		ctx.sampleRate = ctx.SampleRate() + 99
+		ctx := NewContextWith(ContextOptions{
+			SampleRate: DefaultSampleRate + 99,
+		})
 		require.Equal(t, 44199, ctx.SampleRate())
 	})
 
@@ -368,12 +394,12 @@ func Test_Context_NyqistFrequency(t *testing.T) {
 	defer SetSampleRate(DefaultSampleRate)
 
 	t.Run("nil pointer", func(t *testing.T) {
-		var ctx *Context
+		var ctx *context
 		require.Zero(t, ctx.NyqistFrequency())
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
-		var ctx Context
+		var ctx context
 		require.Zero(t, ctx.NyqistFrequency())
 	})
 
@@ -384,17 +410,17 @@ func Test_Context_NyqistFrequency(t *testing.T) {
 }
 
 // Test_Context_Value tests that Context's Value method returns the correct value from a context and
-// handles missing values and bad configurations correctly.
+// correctly handles missing values and bad configurations.
 func Test_Context_Value(t *testing.T) {
 	var testKey ctxKey
 
 	t.Run("nil pointer", func(t *testing.T) {
-		var ctx *Context
+		var ctx *context
 		require.Panics(t, func() { ctx.Value(testKey) })
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
-		var ctx Context
+		var ctx context
 		require.Panics(t, func() { ctx.Value(testKey) })
 	})
 
