@@ -70,13 +70,13 @@ func Test_SampleRate_Concurrency(t *testing.T) {
 	wgStart.Add(1)
 	var wgEnd sync.WaitGroup
 
-	for i := 0; i < numRoutines; i++ {
+	for range numRoutines {
 		wgEnd.Add(1)
 		go func() {
 			defer wgEnd.Done()
 
 			wgStart.Wait()
-			for i := 0; i < numCycles; i++ {
+			for range numCycles {
 				SetSampleRate(SampleRate() + 1)
 			}
 		}()
