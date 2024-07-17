@@ -299,7 +299,7 @@ func Test_Note_IncrementBy(t *testing.T) {
 			{B, C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp},
 		} {
 			base := wantNotes[0]
-			for multiplier := 0; multiplier < 10; multiplier++ {
+			for multiplier := range 10 {
 				for i, wantNote := range wantNotes {
 					require.Equal(t, wantNote, base.IncrementBy((12*multiplier)+i))
 				}
@@ -328,7 +328,7 @@ func Test_Note_IncrementBy(t *testing.T) {
 			{B, ASharp, A, GSharp, G, FSharp, F, E, DSharp, D, CSharp, C},
 		} {
 			base := wantNotes[0]
-			for multiplier := 0; multiplier < 10; multiplier++ {
+			for multiplier := range 10 {
 				for i, wantNote := range wantNotes {
 					require.Equal(t, wantNote, base.IncrementBy(-((12 * multiplier) + i)))
 				}
