@@ -150,15 +150,18 @@ func Test_NewContextWith(t *testing.T) {
 
 	t.Run("default values", func(t *testing.T) {
 		ctx := NewContextWith(ContextOptions{})
+		require.IsType(t, gocontext.Background(), ctx.(*context).Context)
 		require.Equal(t, NewTime(), ctx.Time())
 		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
 	})
 
 	t.Run("configured values", func(t *testing.T) {
 		ctx := NewContextWith(ContextOptions{
+			Context:    gocontext.TODO(),
 			Time:       NewTimeWith(100).ShiftBy(123),
 			SampleRate: 999,
 		})
+		require.IsType(t, gocontext.TODO(), ctx.(*context).Context)
 		require.Equal(t, 1, ctx.Time().Second())
 		require.Equal(t, 24, ctx.Time().Sample())
 		require.Equal(t, 100, ctx.Time().SampleRate())
