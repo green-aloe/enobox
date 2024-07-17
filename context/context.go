@@ -52,6 +52,7 @@ func NewContext() Context {
 
 // ContextOptions is the set of configurations that can be used when building a new custom context.
 type ContextOptions struct {
+	Context    gocontext.Context
 	Time       Time
 	SampleRate int
 	Decorators []Decorator
@@ -61,6 +62,9 @@ type ContextOptions struct {
 // provided. If a necessary option is not set, the default/global value is used. Any decorators
 // provided are run after the global decorators set with AddDecorator.
 func NewContextWith(options ContextOptions) Context {
+	if options.Context == nil {
+		options.Context = gocontext.Background()
+	}
 	if options.SampleRate <= 0 {
 		options.SampleRate = SampleRate()
 	}
@@ -69,7 +73,7 @@ func NewContextWith(options ContextOptions) Context {
 	}
 
 	var ctx Context = &context{
-		Context:    gocontext.Background(),
+		Context:    options.Context,
 		time:       options.Time,
 		sampleRate: options.SampleRate,
 	}
