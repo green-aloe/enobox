@@ -8,7 +8,7 @@ import (
 // A Context holds the context for a single sample of audio.
 type Context interface {
 	gocontext.Context
-	SetValue(key, value any)
+	WithValue(key, value any) Context
 	Time() Time
 	SetTime(time Time)
 	SampleRate() int
@@ -91,14 +91,16 @@ func NewContextWith(options ContextOptions) Context {
 	return ctx
 }
 
-// SetValue sets an arbitrary value in the context under the provided key. The key should follow the
-// same general guidelines for context.WithValue.
-func (ctx *context) SetValue(key, value any) {
+// WithValue sets an arbitrary value in the context under the provided key and returns the context.
+// The key should follow the same general guidelines for the standard library's context.WithValue.
+func (ctx *context) WithValue(key, value any) Context {
 	if ctx == nil || ctx.Context == nil {
-		return
+		return ctx
 	}
 
 	ctx.Context = gocontext.WithValue(ctx.Context, key, value)
+
+	return ctx
 }
 
 // Time returns the context's internal timestamp.
