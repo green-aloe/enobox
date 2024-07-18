@@ -41,8 +41,7 @@ func Test_AddDecorator(t *testing.T) {
 			go func() {
 				defer wg.Done()
 				AddDecorator(func(ctx Context) Context {
-					ctx.SetValue(key, i)
-					return ctx
+					return ctx.WithValue(key, i)
 				})
 			}()
 		}
@@ -101,12 +100,10 @@ func Test_NewContext(t *testing.T) {
 		)
 
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetValue(key1, "value1")
-			return ctx
+			return ctx.WithValue(key1, "value1")
 		})
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetValue(key4, 4)
-			return ctx
+			return ctx.WithValue(key4, 4)
 		})
 		AddDecorator(func(ctx Context) Context {
 			return nil
@@ -116,8 +113,7 @@ func Test_NewContext(t *testing.T) {
 			return ctx
 		})
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetValue(key2, '😬')
-			return ctx
+			return ctx.WithValue(key2, '😬')
 		})
 
 		ctx := NewContext()
@@ -184,12 +180,10 @@ func Test_NewContextWith(t *testing.T) {
 		)
 
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetValue(key1, uint64(1))
-			return ctx
+			return ctx.WithValue(key1, uint64(1))
 		})
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetValue(key4, "value4")
-			return ctx
+			return ctx.WithValue(key4, "value4")
 		})
 		AddDecorator(func(ctx Context) Context {
 			return nil
@@ -199,8 +193,7 @@ func Test_NewContextWith(t *testing.T) {
 			return ctx
 		})
 		AddDecorator(func(ctx Context) Context {
-			ctx.SetValue(key2, "value2")
-			return ctx
+			return ctx.WithValue(key2, "value2")
 		})
 
 		ctx := NewContextWith(ContextOptions{
@@ -209,8 +202,7 @@ func Test_NewContextWith(t *testing.T) {
 					return nil
 				},
 				func(ctx Context) Context {
-					ctx.SetValue(key4, "value4444")
-					return ctx
+					return ctx.WithValue(key4, "value4444")
 				},
 				nil,
 				func(ctx Context) Context {
@@ -218,12 +210,10 @@ func Test_NewContextWith(t *testing.T) {
 					return ctx
 				},
 				func(ctx Context) Context {
-					ctx.SetValue(key5, "value5")
-					return ctx
+					return ctx.WithValue(key5, "value5")
 				},
 				func(ctx Context) Context {
-					ctx.SetValue(key6, struct{ int }{10})
-					return ctx
+					return ctx.WithValue(key6, struct{ int }{10})
 				},
 				func(ctx Context) Context {
 					ctx.SetTime(NewTimeAt(90, 99, 999))
@@ -244,40 +234,48 @@ func Test_NewContextWith(t *testing.T) {
 	})
 }
 
-// Test_Context_SetValue tests that Context's SetValue method sets the correct value in the context.
-func Test_Context_SetValue(t *testing.T) {
+// Test_Context_WithValue tests that Context's WithValue method sets the correct value in the context.
+func Test_Context_WithValue(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
 		var ctx *context
-		require.NotPanics(t, func() { ctx.SetValue("key", "value") })
+		require.NotPanics(t, func() { ctx.WithValue("key", "value") })
 	})
 
 	t.Run("uninitialized", func(t *testing.T) {
 		var ctx context
-		require.NotPanics(t, func() { ctx.SetValue("key", "value") })
+		require.NotPanics(t, func() { ctx.WithValue("key", "value") })
 	})
 
 	t.Run("initialized", func(t *testing.T) {
 		ctx := NewContext()
-		ctx.SetValue("key", "value")
+		ctx = ctx.WithValue("key", "value")
 		require.Equal(t, "value", ctx.Value("key"))
 	})
 
 	t.Run("overwrite", func(t *testing.T) {
 		ctx := NewContext()
-		ctx.SetValue("key", "value1")
-		ctx.SetValue("key", "value2")
+		ctx = ctx.WithValue("key", "value1")
+		ctx = ctx.WithValue("key", "value2")
 		require.Equal(t, "value2", ctx.Value("key"))
+	})
+
+	t.Run("mutable", func(t *testing.T) {
+		ctx1 := NewContext()
+		ctx2 := ctx1.WithValue("key", "value")
+		require.Equal(t, "value", ctx1.Value("key"))
+		require.Equal(t, "value", ctx2.Value("key"))
+		require.Equal(t, ctx1, ctx2)
 	})
 
 	t.Run("nil key", func(t *testing.T) {
 		ctx := NewContext()
-		require.Panics(t, func() { ctx.SetValue(nil, "value") })
+		require.Panics(t, func() { ctx.WithValue(nil, "value") })
 		require.Nil(t, ctx.Value("key"))
 	})
 
 	t.Run("nil value", func(t *testing.T) {
 		ctx := NewContext()
-		ctx.SetValue("key", nil)
+		ctx = ctx.WithValue("key", nil)
 		require.Nil(t, ctx.Value("key"))
 	})
 }
@@ -433,8 +431,8 @@ func Test_Context_Value(t *testing.T) {
 	})
 
 	t.Run("initialized", func(t *testing.T) {
-		ctx := NewContext()
-		ctx.SetValue(testKey, "test")
+		ctx := NewContext().WithValue(testKey, "test")
+		ctx = ctx.WithValue(testKey, "test")
 		require.Equal(t, "test", ctx.Value(testKey))
 	})
 }

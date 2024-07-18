@@ -12,8 +12,7 @@ func ExampleAddDecorator() {
 	var minFreqKey ctxKey
 
 	context.AddDecorator(func(ctx context.Context) context.Context {
-		ctx.SetValue(minFreqKey, 22.22)
-		return ctx
+		return ctx.WithValue(minFreqKey, 22.22)
 	})
 
 	ctx := context.NewContext()
@@ -54,8 +53,7 @@ func ExampleNewContextWith() {
 		SampleRate: 35_000,
 		Decorators: []context.Decorator{
 			func(ctx context.Context) context.Context {
-				ctx.SetValue("key", "value")
-				return ctx
+				return ctx.WithValue("key", "value")
 			},
 		},
 	})
@@ -76,13 +74,13 @@ func ExampleNewContextWith() {
 	// value
 }
 
-func ExampleContext_SetValue() {
+func ExampleContext_WithValue() {
 	ctx := context.NewContext()
 	value := ctx.Value("key")
 
 	fmt.Println(value)
 
-	ctx.SetValue("key", "value")
+	ctx = ctx.WithValue("key", "value")
 	value = ctx.Value("key")
 
 	fmt.Println(value)
