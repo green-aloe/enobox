@@ -14,9 +14,20 @@ func Test_NewTime(t *testing.T) {
 	require.IsType(t, int(0), time.second)
 	require.IsType(t, int(0), time.sample)
 	require.IsType(t, int(0), time.sampleRate)
+
 	require.Equal(t, 0, time.second)
 	require.Equal(t, 1, time.sample)
 	require.Equal(t, 44_100, time.sampleRate)
+}
+
+// Test_NewTimeWith tests that NewTimeWith returns a Time object with the correct values.
+func Test_NewTimeWith(t *testing.T) {
+	time := NewTimeWith(100)
+	require.IsType(t, Time{}, time)
+
+	require.Equal(t, 0, time.second)
+	require.Equal(t, 1, time.sample)
+	require.Equal(t, 100, time.sampleRate)
 }
 
 // Test_Time_Second tests that Time's Second method returns the correct number of complete seconds
