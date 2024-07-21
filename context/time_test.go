@@ -162,7 +162,7 @@ func Test_Time_SampleRate(t *testing.T) {
 
 	subtests := []subtest{
 		{NewTime(), 44_100, "default"},
-		{NewTimeWith(0), 0, "empty"},
+		{Time{}, 0, "empty"},
 		{Time{1, 100, 0}, 0, "samples without seconds, no rate"},
 		{Time{100, 1, 0}, 0, "seconds without samples, no rate"},
 		{Time{50, 70, 0}, 0, "samples and seconds, no rate"},

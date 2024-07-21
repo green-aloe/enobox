@@ -269,7 +269,7 @@ func Test_Context_WithValue(t *testing.T) {
 
 	t.Run("nil key", func(t *testing.T) {
 		ctx := NewContext()
-		require.Panics(t, func() { ctx.WithValue(nil, "value") })
+		require.PanicsWithValue(t, "nil key", func() { ctx.WithValue(nil, "value") })
 		require.Nil(t, ctx.Value("key"))
 	})
 
