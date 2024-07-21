@@ -24,9 +24,19 @@ func NewTime() Time {
 // NewTimeWith returns a timestamp with the lowest value. It uses the provided sample rate to know
 // how many samples are in one second.
 func NewTimeWith(sampleRate int) Time {
+	return NewTimeAt(0, 1, sampleRate)
+}
+
+// NewTimeAt returns a timestamp with the provided data. It panics if second is less than 0, sample
+// is less than 1, or sample is greater than sampleRate.
+func NewTimeAt(second, sample, sampleRate int) Time {
+	if second < 0 || sample < 1 || sample > sampleRate {
+		panic("invalid time")
+	}
+
 	return Time{
-		second:     0,
-		sample:     1,
+		second:     second,
+		sample:     sample,
 		sampleRate: sampleRate,
 	}
 }
