@@ -50,6 +50,53 @@ func Test_NewTimeWith(t *testing.T) {
 	})
 }
 
+// Test_NewTimeAt tests that NewTimeAt returns a Time object with the correct values.
+func Test_NewTimeAt(t *testing.T) {
+	t.Run("types", func(t *testing.T) {
+		time := NewTimeAt(1, 1, 1)
+		require.IsType(t, Time{}, time)
+	})
+
+	t.Run("invalid", func(t *testing.T) {
+		for _, second := range []int{-100, -1} {
+			require.PanicsWithValue(t, "invalid time", func() {
+				NewTimeAt(second, 1, 100)
+			})
+		}
+		for _, sample := range []int{-100, -1, 101} {
+			require.PanicsWithValue(t, "invalid time", func() {
+				NewTimeAt(0, sample, 100)
+			})
+		}
+		for _, sampleRate := range []int{-100, -1, 0, 1} {
+			require.PanicsWithValue(t, "invalid time", func() {
+				NewTimeAt(0, 2, sampleRate)
+			})
+		}
+	})
+
+	t.Run("values", func(t *testing.T) {
+		for _, second := range []int{0, 1, 100, 100_000} {
+			time := NewTimeAt(second, 1, DefaultSampleRate)
+			require.Equal(t, second, time.second)
+			require.Equal(t, 1, time.sample)
+			require.Equal(t, DefaultSampleRate, time.sampleRate)
+		}
+		for _, sample := range []int{1, 100, DefaultSampleRate - 1, DefaultSampleRate} {
+			time := NewTimeAt(4, sample, DefaultSampleRate)
+			require.Equal(t, 4, time.second)
+			require.Equal(t, sample, time.sample)
+			require.Equal(t, DefaultSampleRate, time.sampleRate)
+		}
+		for _, sampleRate := range []int{1, 100, 44_100, 48_000} {
+			time := NewTimeAt(0, 1, sampleRate)
+			require.Equal(t, 0, time.second)
+			require.Equal(t, 1, time.sample)
+			require.Equal(t, sampleRate, time.sampleRate)
+		}
+	})
+}
+
 // Test_Time_Second tests that Time's Second method returns the correct number of complete seconds
 // that have elapsed so far.
 func Test_Time_Second(t *testing.T) {
