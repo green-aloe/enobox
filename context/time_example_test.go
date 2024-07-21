@@ -24,6 +24,15 @@ func ExampleNewTimeWith() {
 	// 0 seconds, sample 1/48000
 }
 
+func ExampleNewTimeAt() {
+	time := context.NewTimeAt(3, 25, context.DefaultSampleRate)
+
+	fmt.Println(time)
+
+	// Output:
+	// 3 seconds, sample 25/44100
+}
+
 func ExampleTime_Second() {
 	time := context.NewTime()
 	second := time.Second()
