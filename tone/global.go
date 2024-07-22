@@ -41,3 +41,14 @@ func NumHarmGains(ctx context.Context) int {
 
 	return 0
 }
+
+// SetNumHarmGains sets the global sample rate (number of samples per second (Hz) in the output). The
+// rate must be greater than zero.
+func SetNumHarmGains(rate int) {
+	numHarmGainsMutex.Lock()
+	defer numHarmGainsMutex.Unlock()
+
+	if rate > 0 {
+		numHarmGains = rate
+	}
+}
