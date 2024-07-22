@@ -26,3 +26,18 @@ func init() {
 		return ctx.WithValue(numHarmGainsKey, numHarmGains)
 	})
 }
+
+// NumHarmGains returns the number of harmonic gains in a tone for this context, or 0 if no value is set.
+func NumHarmGains(ctx context.Context) int {
+	if ctx == nil {
+		return 0
+	}
+
+	if v := ctx.Value(numHarmGainsKey); v != nil {
+		if n, ok := v.(int); ok && n > 0 {
+			return n
+		}
+	}
+
+	return 0
+}
