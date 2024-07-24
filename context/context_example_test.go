@@ -74,6 +74,19 @@ func ExampleNewContextWith() {
 	// value
 }
 
+func ExampleNewTestContext() {
+	ctx := context.NewTestContext()
+	time := ctx.Time()
+	sampleRate := ctx.SampleRate()
+
+	fmt.Println(time)
+	fmt.Println(sampleRate)
+
+	// Output:
+	// invalid time: 0 seconds, sample 0/0
+	// 0
+}
+
 func ExampleContext_WithValue() {
 	ctx := context.NewContext()
 	value := ctx.Value("key")
