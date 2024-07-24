@@ -3,6 +3,7 @@ package context
 import (
 	gocontext "context"
 	"sync"
+	"testing"
 )
 
 // A Context holds the context for a single sample of audio.
@@ -89,6 +90,18 @@ func NewContextWith(options ContextOptions) Context {
 	}
 
 	return ctx
+}
+
+// NewTestContext returns an empty, non-nil context that does not have any default values set. It
+// returns nil if not called from a test. This is meant for testing purposes only.
+func NewTestContext() Context {
+	if !testing.Testing() {
+		return nil
+	}
+
+	return &context{
+		Context: gocontext.Background(),
+	}
 }
 
 // WithValue sets an arbitrary value in the context under the provided key and returns the context.
