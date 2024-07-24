@@ -234,6 +234,29 @@ func Test_NewContextWith(t *testing.T) {
 	})
 }
 
+// Test_NewTestContext tests that NewTestContext returns a Context that is completely empty.
+func Test_NewTestContext(t *testing.T) {
+	t.Run("types", func(t *testing.T) {
+		ctx := NewContextWith(ContextOptions{})
+		require.NotEmpty(t, ctx)
+
+		ectx, ok := ctx.(*context)
+		require.True(t, ok)
+		require.IsType(t, gocontext.Background(), ectx.Context)
+
+		rt := reflect.TypeOf(ctx)
+		ri := reflect.TypeOf((*gocontext.Context)(nil)).Elem()
+		require.True(t, rt.Implements(ri))
+	})
+
+	t.Run("default values", func(t *testing.T) {
+		ctx := NewTestContext()
+		require.NotNil(t, ctx)
+		require.Equal(t, Time{}, ctx.Time())
+		require.Equal(t, 0, ctx.SampleRate())
+	})
+}
+
 // Test_Context_WithValue tests that Context's WithValue method sets the correct value in the context.
 func Test_Context_WithValue(t *testing.T) {
 	t.Run("nil pointer", func(t *testing.T) {
