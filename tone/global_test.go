@@ -1,6 +1,7 @@
 package tone
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/green-aloe/enobox/context"
@@ -71,4 +72,55 @@ func Test_NumHarmGains(t *testing.T) {
 			require.Equal(t, n+1, NumHarmGains(ctx))
 		}
 	})
+}
+
+// Test_SetNumHarmGains tests that SetNumHarmGains sets the global number of harmonic gains in a tone.
+func Test_SetNumHarmGains(t *testing.T) {
+	t.Run("invalid values", func(t *testing.T) {
+		defer SetNumHarmGains(DefaultNumHarmGains)
+
+		for _, n := range []int{0, -1, -20} {
+			SetNumHarmGains(n)
+
+			require.Equal(t, DefaultNumHarmGains, numHarmGains)
+
+			ctx := context.NewContext()
+			require.Equal(t, DefaultNumHarmGains, NumHarmGains(ctx))
+		}
+	})
+
+	t.Run("valid values", func(t *testing.T) {
+		defer SetNumHarmGains(DefaultNumHarmGains)
+
+		for n := range 1_000 {
+			SetNumHarmGains(n + 1)
+
+			require.Equal(t, n+1, numHarmGains)
+
+			ctx := context.NewContext()
+			require.Equal(t, n+1, NumHarmGains(ctx))
+		}
+	})
+}
+
+// Test_NumHarmGains_Concurrency tests that it's safe to concurrently get and set the global number
+// of harmonic gains in a tone.
+func Test_NumHarmGains_Concurrency(t *testing.T) {
+	var wg sync.WaitGroup
+	for i := range 1_000 {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			if i%2 == 0 {
+				ctx := context.NewContext()
+				NumHarmGains(ctx)
+			} else {
+				SetNumHarmGains(i + 1)
+			}
+		}()
+	}
+
+	wg.Wait()
 }
