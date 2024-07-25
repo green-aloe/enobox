@@ -23,6 +23,9 @@ type ctxKey struct{}
 
 func init() {
 	context.AddDecorator(func(ctx context.Context) context.Context {
+		numHarmGainsMutex.RLock()
+		defer numHarmGainsMutex.RUnlock()
+
 		return ctx.WithValue(numHarmGainsKey, numHarmGains)
 	})
 }
