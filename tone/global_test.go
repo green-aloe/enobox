@@ -106,6 +106,8 @@ func Test_SetNumHarmGains(t *testing.T) {
 // Test_NumHarmGains_Concurrency tests that it's safe to concurrently get and set the global number
 // of harmonic gains in a tone.
 func Test_NumHarmGains_Concurrency(t *testing.T) {
+	defer SetNumHarmGains(DefaultNumHarmGains)
+
 	var wg sync.WaitGroup
 	for i := range 1_000 {
 		wg.Add(1)
