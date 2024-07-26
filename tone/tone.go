@@ -2,13 +2,11 @@ package tone
 
 import (
 	"github.com/govalues/decimal"
+	"github.com/green-aloe/enobox/context"
 	"github.com/green-aloe/enobox/note"
 )
 
 const (
-	// Number of harmonic gains above the fundamental frequency that are tracked for each tone by default
-	NumHarmGains = 20
-
 	// Maximum number of significant figures to use when truncating decimals
 	MaxSigFigs = 6
 )
@@ -38,21 +36,21 @@ type Tone struct {
 }
 
 // NewTone initializes a tone with default/zero values.
-func NewTone() Tone {
-	return NewToneAt(0)
+func NewTone(ctx context.Context) Tone {
+	return NewToneAt(ctx, 0)
 }
 
 // NewToneAt initializes a tone with the specified fundamental frequency.
-func NewToneAt(frequency float32) Tone {
+func NewToneAt(ctx context.Context, frequency float32) Tone {
 	return Tone{
 		Frequency:     frequency,
-		HarmonicGains: make([]float32, NumHarmGains),
+		HarmonicGains: make([]float32, NumHarmGains(ctx)),
 	}
 }
 
 // NewToneFrom initializes a tone from the specified note and octave.
-func NewToneFrom(note note.Note, octave int) Tone {
-	return NewToneAt(note.Frequency(octave))
+func NewToneFrom(ctx context.Context, note note.Note, octave int) Tone {
+	return NewToneAt(ctx, note.Frequency(octave))
 }
 
 // HarmonicFreq calculates the frequency of one of the tone's harmonic. The fundamental frequency
