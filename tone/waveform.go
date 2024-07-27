@@ -1,5 +1,7 @@
 package tone
 
+import "github.com/green-aloe/enobox/context"
+
 var (
 	// First 100 harmonic gains for a square waveform, truncated to 6 digits, calculated with this
 	// formula:
@@ -72,8 +74,8 @@ var (
 //   - Harmonic 2: order = 3, frequency = 300Hz, gain = 1/3
 //   - Harmonic 3: order = 4, frequency = 400Hz, gain = 0
 //   - Harmonic 4: order = 5, frequency = 500Hz, gain = 1/5
-func NewSquareTone(frequency float32) Tone {
-	tone := NewToneAt(frequency)
+func NewSquareTone(ctx context.Context, frequency float32) Tone {
+	tone := NewToneAt(ctx, frequency)
 	copy(tone.HarmonicGains, squareHarmGains)
 
 	return tone
@@ -91,8 +93,8 @@ func NewSquareTone(frequency float32) Tone {
 //   - Harmonic 2: order = 3, frequency = 300Hz, gain = 1/9
 //   - Harmonic 3: order = 4, frequency = 400Hz, gain = 0
 //   - Harmonic 4: order = 5, frequency = 500Hz, gain = 1/25
-func NewTriangleTone(frequency float32) Tone {
-	tone := NewToneAt(frequency)
+func NewTriangleTone(ctx context.Context, frequency float32) Tone {
+	tone := NewToneAt(ctx, frequency)
 	copy(tone.HarmonicGains, triangleHarmGains)
 
 	return tone
@@ -110,8 +112,8 @@ func NewTriangleTone(frequency float32) Tone {
 //   - Harmonic 2: order = 3, frequency = 300Hz, gain = 1/3
 //   - Harmonic 3: order = 4, frequency = 400Hz, gain = 1/4
 //   - Harmonic 4: order = 5, frequency = 500Hz, gain = 1/5
-func NewSawtoothTone(frequency float32) Tone {
-	tone := NewToneAt(frequency)
+func NewSawtoothTone(ctx context.Context, frequency float32) Tone {
+	tone := NewToneAt(ctx, frequency)
 	copy(tone.HarmonicGains, sawtoothHarmGains)
 
 	return tone
