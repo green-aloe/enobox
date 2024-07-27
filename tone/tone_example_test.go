@@ -3,12 +3,15 @@ package tone_test
 import (
 	"fmt"
 
+	"github.com/green-aloe/enobox/context"
 	"github.com/green-aloe/enobox/note"
 	"github.com/green-aloe/enobox/tone"
 )
 
 func ExampleNewTone() {
-	tone := tone.NewTone()
+	ctx := context.NewContext()
+
+	tone := tone.NewTone(ctx)
 
 	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
 	fmt.Println(tone.HarmonicGains)
@@ -19,7 +22,9 @@ func ExampleNewTone() {
 }
 
 func ExampleNewToneAt() {
-	tone := tone.NewToneAt(523.2511)
+	ctx := context.NewContext()
+
+	tone := tone.NewToneAt(ctx, 523.2511)
 
 	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
 	fmt.Println(tone.HarmonicGains)
@@ -30,7 +35,9 @@ func ExampleNewToneAt() {
 }
 
 func ExampleNewToneFrom() {
-	tone := tone.NewToneFrom(note.C, 5)
+	ctx := context.NewContext()
+
+	tone := tone.NewToneFrom(ctx, note.C, 5)
 
 	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
 	fmt.Println(tone.HarmonicGains)
@@ -41,7 +48,9 @@ func ExampleNewToneFrom() {
 }
 
 func ExampleNewSquareTone() {
-	sqrTone := tone.NewSquareTone(440)
+	ctx := context.NewContext()
+
+	sqrTone := tone.NewSquareTone(ctx, 440)
 
 	fmt.Println(sqrTone.Frequency, sqrTone.Gain, len(sqrTone.HarmonicGains))
 	fmt.Println(sqrTone.HarmonicGains)
@@ -64,7 +73,9 @@ func ExampleNewSquareTone() {
 }
 
 func ExampleNewTriangleTone() {
-	triTone := tone.NewTriangleTone(440)
+	ctx := context.NewContext()
+
+	triTone := tone.NewTriangleTone(ctx, 440)
 
 	fmt.Println(triTone.Frequency, triTone.Gain, len(triTone.HarmonicGains))
 	fmt.Println(triTone.HarmonicGains)
@@ -87,7 +98,9 @@ func ExampleNewTriangleTone() {
 }
 
 func ExampleNewSawtoothTone() {
-	sawTone := tone.NewSawtoothTone(440)
+	ctx := context.NewContext()
+
+	sawTone := tone.NewSawtoothTone(ctx, 440)
 
 	fmt.Println(sawTone.Frequency, sawTone.Gain, len(sawTone.HarmonicGains))
 	fmt.Println(sawTone.HarmonicGains)
@@ -108,7 +121,9 @@ func ExampleNewSawtoothTone() {
 }
 
 func ExampleTone_HarmonicFreq() {
-	tone := tone.NewTone()
+	ctx := context.NewContext()
+
+	tone := tone.NewTone(ctx)
 	harmFreq1 := tone.HarmonicFreq(2)
 
 	tone.Frequency = 440
@@ -124,7 +139,9 @@ func ExampleTone_HarmonicFreq() {
 }
 
 func ExampleTone_Clone() {
-	tone := tone.NewToneAt(523.2511)
+	ctx := context.NewContext()
+
+	tone := tone.NewToneAt(ctx, 523.2511)
 	clone := tone.Clone()
 
 	tone.Frequency = 440
@@ -139,7 +156,9 @@ func ExampleTone_Clone() {
 }
 
 func ExampleTone_Empty() {
-	tone := tone.NewTone()
+	ctx := context.NewContext()
+
+	tone := tone.NewTone(ctx)
 	isEmpty1 := tone.Empty()
 
 	tone.Frequency = 440
