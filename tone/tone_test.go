@@ -125,6 +125,13 @@ func Test_NewToneFrom(t *testing.T) {
 // Test_Tone_HarmonicFreq tests that Tone's HarmonicFreq method returns the correct frequency for a
 // variety of tones and harmonics.
 func Test_Tone_HarmonicFreq(t *testing.T) {
+	t.Run("nil", func(t *testing.T) {
+		for i := range 10 {
+			var tone *Tone
+			require.Zero(t, tone.HarmonicFreq(i))
+		}
+	})
+
 	ctx := context.NewContext()
 
 	type subtest struct {
@@ -213,6 +220,11 @@ func Test_Tone_HarmonicFreq(t *testing.T) {
 // Test_Tone_Clone tests that Tone's Clone method creates a deep copy of the tone that has all of
 // the same values as the original but does not share any memory with it.
 func Test_Tone_Clone(t *testing.T) {
+	t.Run("nil", func(t *testing.T) {
+		var tone *Tone
+		require.Empty(t, tone.Clone())
+	})
+
 	ctx := context.NewContext()
 
 	type subtest struct {
@@ -257,6 +269,11 @@ func Test_Tone_Clone(t *testing.T) {
 
 // Test_Tone_Empty tests that Tone's Empty method correctly determines whether a tone is empty.
 func Test_Tone_Empty(t *testing.T) {
+	t.Run("nil", func(t *testing.T) {
+		var tone *Tone
+		require.True(t, tone.Empty())
+	})
+
 	ctx := context.NewContext()
 
 	type subtest struct {
