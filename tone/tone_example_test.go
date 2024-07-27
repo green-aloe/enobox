@@ -173,6 +173,26 @@ func ExampleTone_Empty() {
 	// true false false
 }
 
+func ExampleTone_Reset() {
+	ctx := context.NewContext()
+
+	tone := tone.NewSquareTone(ctx, 440)
+
+	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
+	fmt.Println(tone.HarmonicGains)
+
+	tone.Reset()
+
+	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
+	fmt.Println(tone.HarmonicGains)
+
+	// Output:
+	// 440 0 20
+	// [0 0.333333 0 0.2 0 0.142857 0 0.111111 0 0.090909 0 0.076923 0 0.0666666 0 0.0588235 0 0.0526315 0 0.047619]
+	// 0 0 20
+	// [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+}
+
 func ExampleTrunc() {
 	frequencies := []float32{0.123456789, 0.987654321, 99.99}
 	for _, f1 := range frequencies {
