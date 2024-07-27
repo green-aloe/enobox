@@ -3,11 +3,14 @@ package tone
 import (
 	"testing"
 
+	"github.com/green-aloe/enobox/context"
 	"github.com/stretchr/testify/require"
 )
 
 // Test_NewSquareTone tests that NewSquareTone returns a tone that has a square waveform.
 func Test_NewSquareTone(t *testing.T) {
+	defer SetNumHarmGains(DefaultNumHarmGains)
+
 	wantHarmGains := []float32{
 		0, 0.333333, 0, 0.200000, 0, 0.142857, 0, 0.111111, 0, 0.0909090,
 		0, 0.0769230, 0, 0.0666666, 0, 0.0588235, 0, 0.0526315, 0, 0.0476190,
@@ -43,20 +46,26 @@ func Test_NewSquareTone(t *testing.T) {
 
 	for _, subtest := range subtests {
 		t.Run(subtest.name, func(t *testing.T) {
-			// Test positive frequencies.
-			tone := NewSquareTone(subtest.frequency)
-			require.Equal(t, subtest.frequency, tone.Frequency)
-			require.Len(t, tone.HarmonicGains, NumHarmGains)
-			for i, harmGain := range tone.HarmonicGains {
-				require.Equal(t, wantHarmGains[i], harmGain)
-			}
+			for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+				SetNumHarmGains(numHarmGains)
 
-			// Test negative frequencies.
-			tone = NewSquareTone(-subtest.frequency)
-			require.Equal(t, -subtest.frequency, tone.Frequency)
-			require.Len(t, tone.HarmonicGains, NumHarmGains)
-			for i, harmGain := range tone.HarmonicGains {
-				require.Equal(t, wantHarmGains[i], harmGain)
+				ctx := context.NewContext()
+
+				// Test positive frequencies.
+				tone := NewSquareTone(ctx, subtest.frequency)
+				require.Equal(t, subtest.frequency, tone.Frequency)
+				require.Len(t, tone.HarmonicGains, numHarmGains)
+				for i, harmGain := range tone.HarmonicGains {
+					require.Equal(t, wantHarmGains[i], harmGain)
+				}
+
+				// Test negative frequencies.
+				tone = NewSquareTone(ctx, -subtest.frequency)
+				require.Equal(t, -subtest.frequency, tone.Frequency)
+				require.Len(t, tone.HarmonicGains, numHarmGains)
+				for i, harmGain := range tone.HarmonicGains {
+					require.Equal(t, wantHarmGains[i], harmGain)
+				}
 			}
 		})
 	}
@@ -64,6 +73,8 @@ func Test_NewSquareTone(t *testing.T) {
 
 // Test_NewTriangleTone tests that NewTriangleTone returns a tone that has a triangle waveform.
 func Test_NewTriangleTone(t *testing.T) {
+	defer SetNumHarmGains(DefaultNumHarmGains)
+
 	wantHarmGains := []float32{
 		0, 0.111111, 0, 0.0400000, 0, 0.0204081, 0, 0.0123456, 0, 0.00826446,
 		0, 0.00591716, 0, 0.00444444, 0, 0.00346020, 0, 0.00277008, 0, 0.00226757,
@@ -99,20 +110,26 @@ func Test_NewTriangleTone(t *testing.T) {
 
 	for _, subtest := range subtests {
 		t.Run(subtest.name, func(t *testing.T) {
-			// Test positive frequencies.
-			tone := NewTriangleTone(subtest.frequency)
-			require.Equal(t, subtest.frequency, tone.Frequency)
-			require.Len(t, tone.HarmonicGains, NumHarmGains)
-			for i, harmGain := range tone.HarmonicGains {
-				require.Equal(t, wantHarmGains[i], harmGain)
-			}
+			for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+				SetNumHarmGains(numHarmGains)
 
-			// Test negative frequencies.
-			tone = NewTriangleTone(-subtest.frequency)
-			require.Equal(t, -subtest.frequency, tone.Frequency)
-			require.Len(t, tone.HarmonicGains, NumHarmGains)
-			for i, harmGain := range tone.HarmonicGains {
-				require.Equal(t, wantHarmGains[i], harmGain)
+				ctx := context.NewContext()
+
+				// Test positive frequencies.
+				tone := NewTriangleTone(ctx, subtest.frequency)
+				require.Equal(t, subtest.frequency, tone.Frequency)
+				require.Len(t, tone.HarmonicGains, numHarmGains)
+				for i, harmGain := range tone.HarmonicGains {
+					require.Equal(t, wantHarmGains[i], harmGain)
+				}
+
+				// Test negative frequencies.
+				tone = NewTriangleTone(ctx, -subtest.frequency)
+				require.Equal(t, -subtest.frequency, tone.Frequency)
+				require.Len(t, tone.HarmonicGains, numHarmGains)
+				for i, harmGain := range tone.HarmonicGains {
+					require.Equal(t, wantHarmGains[i], harmGain)
+				}
 			}
 		})
 	}
@@ -120,6 +137,8 @@ func Test_NewTriangleTone(t *testing.T) {
 
 // Test_NewSawtoothTone tests that NewSawtoothTone returns a tone that has a sawtooth waveform.
 func Test_NewSawtoothTone(t *testing.T) {
+	defer SetNumHarmGains(DefaultNumHarmGains)
+
 	wantHarmGains := []float32{
 		0.500000, 0.333333, 0.250000, 0.200000, 0.166666, 0.142857, 0.125000, 0.111111, 0.100000, 0.0909090,
 		0.0833333, 0.0769230, 0.0714285, 0.0666666, 0.0625000, 0.0588235, 0.0555555, 0.0526315, 0.0500000, 0.0476190,
@@ -155,20 +174,26 @@ func Test_NewSawtoothTone(t *testing.T) {
 
 	for _, subtest := range subtests {
 		t.Run(subtest.name, func(t *testing.T) {
-			// Test positive frequencies.
-			tone := NewSawtoothTone(subtest.frequency)
-			require.Equal(t, subtest.frequency, tone.Frequency)
-			require.Len(t, tone.HarmonicGains, NumHarmGains)
-			for i, harmGain := range tone.HarmonicGains {
-				require.Equal(t, wantHarmGains[i], harmGain)
-			}
+			for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+				SetNumHarmGains(numHarmGains)
 
-			// Test negative frequencies.
-			tone = NewSawtoothTone(-subtest.frequency)
-			require.Equal(t, -subtest.frequency, tone.Frequency)
-			require.Len(t, tone.HarmonicGains, NumHarmGains)
-			for i, harmGain := range tone.HarmonicGains {
-				require.Equal(t, wantHarmGains[i], harmGain)
+				ctx := context.NewContext()
+
+				// Test positive frequencies.
+				tone := NewSawtoothTone(ctx, subtest.frequency)
+				require.Equal(t, subtest.frequency, tone.Frequency)
+				require.Len(t, tone.HarmonicGains, numHarmGains)
+				for i, harmGain := range tone.HarmonicGains {
+					require.Equal(t, wantHarmGains[i], harmGain)
+				}
+
+				// Test negative frequencies.
+				tone = NewSawtoothTone(ctx, -subtest.frequency)
+				require.Equal(t, -subtest.frequency, tone.Frequency)
+				require.Len(t, tone.HarmonicGains, numHarmGains)
+				for i, harmGain := range tone.HarmonicGains {
+					require.Equal(t, wantHarmGains[i], harmGain)
+				}
 			}
 		})
 	}
