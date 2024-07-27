@@ -18,7 +18,7 @@ func ExampleNumHarmGains() {
 }
 
 func ExampleSetNumHarmGains() {
-	for _, n := range []int{10, 100} {
+	for _, n := range []int{10, 100, tone.DefaultNumHarmGains} {
 		tone.SetNumHarmGains(n)
 
 		ctx := context.NewContext()
@@ -30,4 +30,5 @@ func ExampleSetNumHarmGains() {
 	// Output:
 	// 10
 	// 100
+	// 20
 }
