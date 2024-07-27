@@ -58,8 +58,8 @@ func NewToneFrom(ctx context.Context, note note.Note, octave int) Tone {
 //
 // As an example, if the tone has a fundamental frequency of 440Hz, then the first harmonic (order=2) is
 // 880Hz and the second harmonic (order=3) is 1320Hz,
-func (tone Tone) HarmonicFreq(order int) float32 {
-	if order <= 0 || tone.Frequency == 0 {
+func (tone *Tone) HarmonicFreq(order int) float32 {
+	if tone == nil || order <= 0 || tone.Frequency == 0 {
 		return 0
 	}
 
@@ -79,9 +79,13 @@ func (tone Tone) HarmonicFreq(order int) float32 {
 
 // Clone returns a complete copy of the tone that has all of the same values as the original but
 // does not share any memory with it.
-func (tone Tone) Clone() Tone {
+func (tone *Tone) Clone() Tone {
+	if tone == nil {
+		return Tone{}
+	}
+
 	// Copy over all the basic fields.
-	c := tone
+	c := *tone
 
 	// Copy over the extended fields.
 	c.HarmonicGains = make([]float32, len(tone.HarmonicGains))
@@ -91,7 +95,11 @@ func (tone Tone) Clone() Tone {
 }
 
 // Empty checks whether the tone does not have any values set.
-func (tone Tone) Empty() bool {
+func (tone *Tone) Empty() bool {
+	if tone == nil {
+		return true
+	}
+
 	if tone.Frequency != 0 {
 		return false
 	}
