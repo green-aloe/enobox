@@ -287,3 +287,55 @@ func Test_Tone_Empty(t *testing.T) {
 		})
 	}
 }
+
+// Test_Tone_Reset tests that Tone's Reset method correctly resets a tone to its default values.
+func Test_Tone_Reset(t *testing.T) {
+	defer SetNumHarmGains(DefaultNumHarmGains)
+
+	t.Run("nil", func(t *testing.T) {
+		var tone *Tone
+
+		require.NotPanics(t, func() { tone.Reset() })
+	})
+
+	t.Run("uninitialized", func(t *testing.T) {
+		var tone Tone
+
+		tone.Reset()
+		require.True(t, tone.Empty())
+		require.Len(t, tone.HarmonicGains, 0)
+	})
+
+	for _, numHarmGains := range []int{1, DefaultNumHarmGains, 100} {
+		SetNumHarmGains(numHarmGains)
+
+		ctx := context.NewContext()
+
+		t.Run("initialized", func(t *testing.T) {
+			tone := NewTone(ctx)
+
+			tone.Reset()
+			require.True(t, tone.Empty())
+			require.Len(t, tone.HarmonicGains, numHarmGains)
+		})
+
+		t.Run("initialized with frequency", func(t *testing.T) {
+			tone := NewToneAt(ctx, 123.11)
+
+			tone.Reset()
+			require.True(t, tone.Empty())
+			require.Len(t, tone.HarmonicGains, numHarmGains)
+		})
+
+		t.Run("initialized with harmonics", func(t *testing.T) {
+			tone := NewToneAt(ctx, 52.24)
+			for i := range tone.HarmonicGains {
+				tone.HarmonicGains[i] = float32(i) + 1.1
+			}
+
+			tone.Reset()
+			require.True(t, tone.Empty())
+			require.Len(t, tone.HarmonicGains, numHarmGains)
+		})
+	}
+}
