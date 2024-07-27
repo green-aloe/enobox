@@ -108,3 +108,17 @@ func (tone Tone) Empty() bool {
 
 	return true
 }
+
+// Reset resets the tone to its zero values. The harmonic gains are set to zero, but the slice header
+// does not change.
+func (tone *Tone) Reset() {
+	if tone == nil {
+		return
+	}
+
+	tone.Frequency = 0
+	tone.Gain = 0
+	for i := range tone.HarmonicGains {
+		tone.HarmonicGains[i] = 0
+	}
+}
