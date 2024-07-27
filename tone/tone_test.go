@@ -4,32 +4,37 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/green-aloe/enobox/context"
 	"github.com/green-aloe/enobox/note"
 	"github.com/stretchr/testify/require"
 )
 
-// Test_Consts tests any package-level constant values.
-func Test_Consts(t *testing.T) {
-	require.Equal(t, 20, NumHarmGains)
-	require.Equal(t, 6, MaxSigFigs)
-}
-
 // Test_NewTone tests that NewTone returns a tone that has been initialized correctly.
 func Test_NewTone(t *testing.T) {
-	tone := NewTone()
-	require.NotEmpty(t, tone)
-	require.IsType(t, Tone{}, tone)
-	require.Zero(t, tone.Frequency)
-	require.Zero(t, tone.Gain)
-	require.Len(t, tone.HarmonicGains, NumHarmGains)
-	for _, gain := range tone.HarmonicGains {
-		require.Zero(t, gain)
+	defer SetNumHarmGains(DefaultNumHarmGains)
+
+	for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+		SetNumHarmGains(numHarmGains)
+
+		ctx := context.NewContext()
+
+		tone := NewTone(ctx)
+		require.NotEmpty(t, tone)
+		require.IsType(t, Tone{}, tone)
+		require.Zero(t, tone.Frequency)
+		require.Zero(t, tone.Gain)
+		require.Len(t, tone.HarmonicGains, numHarmGains)
+		for _, gain := range tone.HarmonicGains {
+			require.Zero(t, gain)
+		}
 	}
 }
 
 // Test_NewToneAt tests that NewToneAt returns a tone that has been initialized with the correct
 // fundamental frequency.
 func Test_NewToneAt(t *testing.T) {
+	defer SetNumHarmGains(DefaultNumHarmGains)
+
 	type subtest struct {
 		frequency float32
 		name      string
@@ -45,14 +50,20 @@ func Test_NewToneAt(t *testing.T) {
 
 	for _, subtest := range subtests {
 		t.Run(subtest.name, func(t *testing.T) {
-			tone := NewToneAt(subtest.frequency)
-			require.NotEmpty(t, tone)
-			require.IsType(t, Tone{}, tone)
-			require.Equal(t, subtest.frequency, tone.Frequency)
-			require.Zero(t, tone.Gain)
-			require.Len(t, tone.HarmonicGains, NumHarmGains)
-			for _, gain := range tone.HarmonicGains {
-				require.Zero(t, gain)
+			for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+				SetNumHarmGains(numHarmGains)
+
+				ctx := context.NewContext()
+
+				tone := NewToneAt(ctx, subtest.frequency)
+				require.NotEmpty(t, tone)
+				require.IsType(t, Tone{}, tone)
+				require.Equal(t, subtest.frequency, tone.Frequency)
+				require.Zero(t, tone.Gain)
+				require.Len(t, tone.HarmonicGains, numHarmGains)
+				for _, gain := range tone.HarmonicGains {
+					require.Zero(t, gain)
+				}
 			}
 		})
 	}
@@ -61,21 +72,26 @@ func Test_NewToneAt(t *testing.T) {
 // Test_NewToneFrom tests that NewToneFrom returns a tone that has been initialized with the correct
 // fundamental frequency for various notes and octaves.
 func Test_NewToneFrom(t *testing.T) {
+	defer SetNumHarmGains(DefaultNumHarmGains)
 
 	t.Run("invalid note", func(t *testing.T) {
-		tone := NewToneFrom(note.Note("H"), 5)
-		require.Equal(t, NewTone(), tone)
+		ctx := context.NewContext()
 
-		tone = NewToneFrom(note.Note(note.C+"b"), 5)
-		require.Equal(t, NewTone(), tone)
+		tone := NewToneFrom(ctx, note.Note("H"), 5)
+		require.Equal(t, NewTone(ctx), tone)
+
+		tone = NewToneFrom(ctx, note.Note(note.C+"b"), 5)
+		require.Equal(t, NewTone(ctx), tone)
 	})
 
 	t.Run("invalid octave", func(t *testing.T) {
-		tone := NewToneFrom(note.C, -2)
-		require.Equal(t, NewTone(), tone)
+		ctx := context.NewContext()
 
-		tone = NewToneFrom(note.C, 11)
-		require.Equal(t, NewTone(), tone)
+		tone := NewToneFrom(ctx, note.C, -2)
+		require.Equal(t, NewTone(ctx), tone)
+
+		tone = NewToneFrom(ctx, note.C, 11)
+		require.Equal(t, NewTone(ctx), tone)
 	})
 
 	for _, note := range []note.Note{
@@ -85,15 +101,21 @@ func Test_NewToneFrom(t *testing.T) {
 	} {
 		for octave := -1; octave <= 10; octave++ {
 			t.Run(fmt.Sprintf("%v%v", note, octave), func(t *testing.T) {
-				tone := NewToneFrom(note, octave)
-				require.NotEmpty(t, tone)
-				require.IsType(t, Tone{}, tone)
-				require.Greater(t, tone.Frequency, float32(8))
-				require.Equal(t, note.Frequency(octave), tone.Frequency)
-				require.Zero(t, tone.Gain)
-				require.Len(t, tone.HarmonicGains, NumHarmGains)
-				for _, gain := range tone.HarmonicGains {
-					require.Zero(t, gain)
+				for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+					SetNumHarmGains(numHarmGains)
+
+					ctx := context.NewContext()
+
+					tone := NewToneFrom(ctx, note, octave)
+					require.NotEmpty(t, tone)
+					require.IsType(t, Tone{}, tone)
+					require.Greater(t, tone.Frequency, float32(8))
+					require.Equal(t, note.Frequency(octave), tone.Frequency)
+					require.Zero(t, tone.Gain)
+					require.Len(t, tone.HarmonicGains, numHarmGains)
+					for _, gain := range tone.HarmonicGains {
+						require.Zero(t, gain)
+					}
 				}
 			})
 		}
@@ -103,6 +125,8 @@ func Test_NewToneFrom(t *testing.T) {
 // Test_Tone_HarmonicFreq tests that Tone's HarmonicFreq method returns the correct frequency for a
 // variety of tones and harmonics.
 func Test_Tone_HarmonicFreq(t *testing.T) {
+	ctx := context.NewContext()
+
 	type subtest struct {
 		tone Tone
 		n    int
@@ -114,22 +138,22 @@ func Test_Tone_HarmonicFreq(t *testing.T) {
 		{Tone{}, 0, 0, "empty tone, no harmonic"},
 		{Tone{}, -1, 0, "empty tone, negative harmonic"},
 		{Tone{}, 1, 0, "empty tone, positive harmonic"},
-		{NewTone(), 0, 0, "new tone, no harmonic"},
-		{NewTone(), -1, 0, "new tone, negative harmonic"},
-		{NewTone(), 1, 0, "new tone, positive harmonic"},
-		{NewToneAt(0), 0, 0, "zero frequency, no harmonic"},
-		{NewToneAt(0), -10, 0, "zero frequency, negative harmonic"},
-		{NewToneAt(0), 10, 0, "zero frequency, positive harmonic"},
-		{NewToneAt(-10), 0, 0, "negative frequency, no harmonic"},
-		{NewToneAt(-10), -1, 0, "negative frequency, negative harmonic"},
-		{NewToneAt(-10), 2, 0, "negative frequency, positive harmonic to zero"},
-		{NewToneAt(-10), 9, 70, "negative frequency, positive harmonic"},
-		{NewToneAt(440), 0, 0, "positive frequency, no harmonic"},
-		{NewToneAt(440), -2, 0, "positive frequency, negative harmonic"},
-		{NewToneAt(440), 5, 2200, "positive frequency, positive harmonic"},
-		{NewToneAt(23.1), 0, 0, "non-integer frequency, no harmonic"},
-		{NewToneAt(587.3295), -1, 0, "non-integer frequency, negative harmonic"},
-		{NewToneAt(87.30706), 9, 785.763, "non-integer frequency, positive harmonic"},
+		{NewTone(ctx), 0, 0, "new tone, no harmonic"},
+		{NewTone(ctx), -1, 0, "new tone, negative harmonic"},
+		{NewTone(ctx), 1, 0, "new tone, positive harmonic"},
+		{NewToneAt(ctx, 0), 0, 0, "zero frequency, no harmonic"},
+		{NewToneAt(ctx, 0), -10, 0, "zero frequency, negative harmonic"},
+		{NewToneAt(ctx, 0), 10, 0, "zero frequency, positive harmonic"},
+		{NewToneAt(ctx, -10), 0, 0, "negative frequency, no harmonic"},
+		{NewToneAt(ctx, -10), -1, 0, "negative frequency, negative harmonic"},
+		{NewToneAt(ctx, -10), 2, 0, "negative frequency, positive harmonic to zero"},
+		{NewToneAt(ctx, -10), 9, 70, "negative frequency, positive harmonic"},
+		{NewToneAt(ctx, 440), 0, 0, "positive frequency, no harmonic"},
+		{NewToneAt(ctx, 440), -2, 0, "positive frequency, negative harmonic"},
+		{NewToneAt(ctx, 440), 5, 2200, "positive frequency, positive harmonic"},
+		{NewToneAt(ctx, 23.1), 0, 0, "non-integer frequency, no harmonic"},
+		{NewToneAt(ctx, 587.3295), -1, 0, "non-integer frequency, negative harmonic"},
+		{NewToneAt(ctx, 87.30706), 9, 785.763, "non-integer frequency, positive harmonic"},
 	}
 
 	for _, subtest := range subtests {
@@ -171,14 +195,14 @@ func Test_Tone_HarmonicFreq(t *testing.T) {
 		wantsPos := wantsNeg[2:]
 
 		// Test a tone with a negative fundamental frequency.
-		negTone := NewToneAt(-fundFreq)
+		negTone := NewToneAt(ctx, -fundFreq)
 		for i, want := range wantsNeg {
 			have := negTone.HarmonicFreq(i + 1)
 			require.Equal(t, want, have)
 		}
 
 		// Test a tone with a positive fundamental frequency.
-		posTone := NewToneAt(fundFreq)
+		posTone := NewToneAt(ctx, fundFreq)
 		for i, want := range wantsPos {
 			have := posTone.HarmonicFreq(i + 1)
 			require.Equal(t, want, have)
@@ -189,6 +213,8 @@ func Test_Tone_HarmonicFreq(t *testing.T) {
 // Test_Tone_Clone tests that Tone's Clone method creates a deep copy of the tone that has all of
 // the same values as the original but does not share any memory with it.
 func Test_Tone_Clone(t *testing.T) {
+	ctx := context.NewContext()
+
 	type subtest struct {
 		tone Tone
 		name string
@@ -196,8 +222,8 @@ func Test_Tone_Clone(t *testing.T) {
 
 	subtests := []subtest{
 		{Tone{}, "empty"},
-		{NewTone(), "new"},
-		{NewToneAt(42), "frequency only"},
+		{NewTone(ctx), "new"},
+		{NewToneAt(ctx, 42), "frequency only"},
 		{Tone{0, 0, []float32{}}, "empty, no harmonics"},
 		{Tone{1, 1, []float32{}}, "frequency and gain only"},
 		{Tone{0, 0, []float32{.41, 103.3}}, "harmonics only"},
@@ -231,6 +257,8 @@ func Test_Tone_Clone(t *testing.T) {
 
 // Test_Tone_Empty tests that Tone's Empty method correctly determines whether a tone is empty.
 func Test_Tone_Empty(t *testing.T) {
+	ctx := context.NewContext()
+
 	type subtest struct {
 		want bool
 		tone Tone
@@ -239,7 +267,7 @@ func Test_Tone_Empty(t *testing.T) {
 
 	subtests := []subtest{
 		{true, Tone{}, "empty"},
-		{true, NewTone(), "new"},
+		{true, NewTone(ctx), "new"},
 		{false, Tone{10, 0, nil}, "frequency only"},
 		{false, Tone{0, 10, nil}, "gain only"},
 		{false, Tone{0, 0, []float32{0.1, 0.2}}, "harmonics only"},
@@ -248,9 +276,9 @@ func Test_Tone_Empty(t *testing.T) {
 		{false, Tone{10, 10, []float32{-20}}, "all fields, negative harmonic gain"},
 		{false, Tone{-20, 0, nil}, "negative frequency"},
 		{false, Tone{0, -20, nil}, "negative gain"},
-		{false, NewSquareTone(10), "square tone"},
-		{false, NewTriangleTone(20), "triangle tone"},
-		{false, NewSawtoothTone(30), "sawtooth tone"},
+		{false, NewSquareTone(ctx, 10), "square tone"},
+		{false, NewTriangleTone(ctx, 20), "triangle tone"},
+		{false, NewSawtoothTone(ctx, 30), "sawtooth tone"},
 	}
 
 	for _, subtest := range subtests {
