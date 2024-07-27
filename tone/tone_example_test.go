@@ -13,12 +13,10 @@ func ExampleNewTone() {
 
 	tone := tone.NewTone(ctx)
 
-	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
-	fmt.Println(tone.HarmonicGains)
+	fmt.Println(tone.Frequency, tone.Gain, tone.HarmonicGains)
 
 	// Output:
-	// 0 0 20
-	// [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+	// 0 0 [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
 }
 
 func ExampleNewToneAt() {
@@ -26,12 +24,10 @@ func ExampleNewToneAt() {
 
 	tone := tone.NewToneAt(ctx, 523.2511)
 
-	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
-	fmt.Println(tone.HarmonicGains)
+	fmt.Println(tone.Frequency, tone.Gain, tone.HarmonicGains)
 
 	// Output:
-	// 523.2511 0 20
-	// [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+	// 523.2511 0 [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
 }
 
 func ExampleNewToneFrom() {
@@ -39,12 +35,10 @@ func ExampleNewToneFrom() {
 
 	tone := tone.NewToneFrom(ctx, note.C, 5)
 
-	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
-	fmt.Println(tone.HarmonicGains)
+	fmt.Println(tone.Frequency, tone.Gain, tone.HarmonicGains)
 
 	// Output:
-	// 523.2511 0 20
-	// [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+	// 523.2511 0 [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
 }
 
 func ExampleNewSquareTone() {
@@ -52,8 +46,7 @@ func ExampleNewSquareTone() {
 
 	sqrTone := tone.NewSquareTone(ctx, 440)
 
-	fmt.Println(sqrTone.Frequency, sqrTone.Gain, len(sqrTone.HarmonicGains))
-	fmt.Println(sqrTone.HarmonicGains)
+	fmt.Println(sqrTone.Frequency, sqrTone.Gain, sqrTone.HarmonicGains)
 
 	// Show the calculation for each harmonic gain.
 	// gain = 1 / order if order is odd, 0 if order is even
@@ -67,8 +60,7 @@ func ExampleNewSquareTone() {
 	fmt.Println(gains)
 
 	// Output:
-	// 440 0 20
-	// [0 0.333333 0 0.2 0 0.142857 0 0.111111 0 0.090909 0 0.076923 0 0.0666666 0 0.0588235 0 0.0526315 0 0.047619]
+	// 440 0 [0 0.333333 0 0.2 0 0.142857 0 0.111111 0 0.090909 0 0.076923 0 0.0666666 0 0.0588235 0 0.0526315 0 0.047619]
 	// [0 0.333333 0 0.2 0 0.142857 0 0.111111 0 0.090909 0 0.076923 0 0.0666666 0 0.0588235 0 0.0526315 0 0.047619]
 }
 
@@ -77,8 +69,7 @@ func ExampleNewTriangleTone() {
 
 	triTone := tone.NewTriangleTone(ctx, 440)
 
-	fmt.Println(triTone.Frequency, triTone.Gain, len(triTone.HarmonicGains))
-	fmt.Println(triTone.HarmonicGains)
+	fmt.Println(triTone.Frequency, triTone.Gain, triTone.HarmonicGains)
 
 	// Show the calculation for each harmonic gain.
 	// gain = 1 / order^2 if order is odd, 0 if order is even
@@ -92,8 +83,7 @@ func ExampleNewTriangleTone() {
 	fmt.Println(gains)
 
 	// Output:
-	// 440 0 20
-	// [0 0.111111 0 0.04 0 0.0204081 0 0.0123456 0 0.00826446 0 0.00591716 0 0.00444444 0 0.0034602 0 0.00277008 0 0.00226757]
+	// 440 0 [0 0.111111 0 0.04 0 0.0204081 0 0.0123456 0 0.00826446 0 0.00591716 0 0.00444444 0 0.0034602 0 0.00277008 0 0.00226757]
 	// [0 0.111111 0 0.04 0 0.0204081 0 0.0123456 0 0.00826446 0 0.00591716 0 0.00444444 0 0.0034602 0 0.00277008 0 0.00226757]
 }
 
@@ -102,8 +92,7 @@ func ExampleNewSawtoothTone() {
 
 	sawTone := tone.NewSawtoothTone(ctx, 440)
 
-	fmt.Println(sawTone.Frequency, sawTone.Gain, len(sawTone.HarmonicGains))
-	fmt.Println(sawTone.HarmonicGains)
+	fmt.Println(sawTone.Frequency, sawTone.Gain, sawTone.HarmonicGains)
 
 	// Show the calculation for each harmonic gain.
 	// gain = 1 / order
@@ -115,8 +104,7 @@ func ExampleNewSawtoothTone() {
 	fmt.Println(gains)
 
 	// Output:
-	// 440 0 20
-	// [0.5 0.333333 0.25 0.2 0.166666 0.142857 0.125 0.111111 0.1 0.090909 0.0833333 0.076923 0.0714285 0.0666666 0.0625 0.0588235 0.0555555 0.0526315 0.05 0.047619]
+	// 440 0 [0.5 0.333333 0.25 0.2 0.166666 0.142857 0.125 0.111111 0.1 0.090909 0.0833333 0.076923 0.0714285 0.0666666 0.0625 0.0588235 0.0555555 0.0526315 0.05 0.047619]
 	// [0.5 0.333333 0.25 0.2 0.166666 0.142857 0.125 0.111111 0.1 0.090909 0.0833333 0.076923 0.0714285 0.0666666 0.0625 0.0588235 0.0555555 0.0526315 0.05 0.047619]
 }
 
@@ -141,18 +129,21 @@ func ExampleTone_HarmonicFreq() {
 func ExampleTone_Clone() {
 	ctx := context.NewContext()
 
-	tone := tone.NewToneAt(ctx, 523.2511)
+	tone := tone.NewToneWith(ctx, 523.2511, 0.5, []float32{0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0})
 	clone := tone.Clone()
 
 	tone.Frequency = 440
-	clone.Gain = 1
+	tone.Gain = 1
+	tone.HarmonicGains[0] = 100
+	tone.HarmonicGains[1] = 200
+	tone.HarmonicGains[2] = 300
 
-	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
-	fmt.Println(clone.Frequency, clone.Gain, len(clone.HarmonicGains))
+	fmt.Println(tone.Frequency, tone.Gain, tone.HarmonicGains)
+	fmt.Println(clone.Frequency, clone.Gain, clone.HarmonicGains)
 
 	// Output:
-	// 440 0 20
-	// 523.2511 1 20
+	// 440 1 [100 200 300 0.4 0.5 0.6 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2]
+	// 523.2511 0.5 [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2]
 }
 
 func ExampleTone_Empty() {
@@ -178,19 +169,15 @@ func ExampleTone_Reset() {
 
 	tone := tone.NewSquareTone(ctx, 440)
 
-	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
-	fmt.Println(tone.HarmonicGains)
+	fmt.Println(tone.Frequency, tone.Gain, tone.HarmonicGains)
 
 	tone.Reset()
 
-	fmt.Println(tone.Frequency, tone.Gain, len(tone.HarmonicGains))
-	fmt.Println(tone.HarmonicGains)
+	fmt.Println(tone.Frequency, tone.Gain, tone.HarmonicGains)
 
 	// Output:
-	// 440 0 20
-	// [0 0.333333 0 0.2 0 0.142857 0 0.111111 0 0.090909 0 0.076923 0 0.0666666 0 0.0588235 0 0.0526315 0 0.047619]
-	// 0 0 20
-	// [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+	// 440 0 [0 0.333333 0 0.2 0 0.142857 0 0.111111 0 0.090909 0 0.076923 0 0.0666666 0 0.0588235 0 0.0526315 0 0.047619]
+	// 0 0 [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
 }
 
 func ExampleTrunc() {
