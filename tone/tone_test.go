@@ -122,6 +122,139 @@ func Test_NewToneFrom(t *testing.T) {
 	}
 }
 
+// Test_NewToneWith tests that NewToneWith returns a tone that has been initialized with the correct
+// fundamental frequency, gain, and harmonic gains.
+func Test_NewToneWith(t *testing.T) {
+	defer SetNumHarmGains(DefaultNumHarmGains)
+
+	t.Run("zero length", func(t *testing.T) {
+		ctx := context.NewContext()
+		require.Equal(t, 20, NumHarmGains(ctx))
+
+		tone := NewToneWith(ctx, 123.456, 0.789, nil)
+
+		require.IsType(t, Tone{}, tone)
+		require.Equal(t, float32(123.456), tone.Frequency)
+		require.Equal(t, float32(0.789), tone.Gain)
+		require.Equal(t, []float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, tone.HarmonicGains)
+	})
+
+	t.Run("short length, short capacity", func(t *testing.T) {
+		ctx := context.NewContext()
+		require.Equal(t, 20, NumHarmGains(ctx))
+
+		gains := make([]float32, 5, 8)
+		for i := range gains {
+			gains[i] = float32(i + 1)
+		}
+		tone := NewToneWith(ctx, 123.456, 0.789, gains)
+
+		require.IsType(t, Tone{}, tone)
+		require.Equal(t, float32(123.456), tone.Frequency)
+		require.Equal(t, float32(0.789), tone.Gain)
+		require.Equal(t, []float32{1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, tone.HarmonicGains)
+
+		// We needed more harmonic gains than were provided. The provided slice was too short, and
+		// it did not have enough capacity to grow in place. We should have allocated a new slice
+		// and used a new backing array.
+		for i := range gains {
+			gains[i] += 100
+		}
+		require.Equal(t, []float32{1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, tone.HarmonicGains)
+	})
+
+	t.Run("short length, long capacity", func(t *testing.T) {
+		ctx := context.NewContext()
+		require.Equal(t, 20, NumHarmGains(ctx))
+
+		gains := make([]float32, 5, 30)
+		for i := range gains {
+			gains[i] = float32(i + 1)
+		}
+		tone := NewToneWith(ctx, 123.456, 0.789, gains)
+
+		require.IsType(t, Tone{}, tone)
+		require.Equal(t, float32(123.456), tone.Frequency)
+		require.Equal(t, float32(0.789), tone.Gain)
+		require.Equal(t, []float32{1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, tone.HarmonicGains)
+
+		// We needed more harmonic gains than were provided. The provided slice was too short, but
+		// it had enough capacity to grow in place. We should not have allocated a new slice and
+		// should be using the same backing array.
+		for i := range gains {
+			gains[i] += 100
+		}
+		require.Equal(t, []float32{101, 102, 103, 104, 105, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, tone.HarmonicGains)
+	})
+
+	t.Run("expected length", func(t *testing.T) {
+		ctx := context.NewContext()
+		require.Equal(t, 20, NumHarmGains(ctx))
+
+		gains := make([]float32, 20)
+		for i := range gains {
+			gains[i] = float32(i + 1)
+		}
+		tone := NewToneWith(ctx, 123.456, 0.789, gains)
+
+		require.IsType(t, Tone{}, tone)
+		require.Equal(t, float32(123.456), tone.Frequency)
+		require.Equal(t, float32(0.789), tone.Gain)
+		require.Equal(t, []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}, tone.HarmonicGains)
+
+		// We did not need to change anything about the slice of harmonic gains provided. We should
+		// still be using the same backing array.
+		for i := range gains {
+			gains[i] += 100
+		}
+		require.Equal(t, []float32{101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120}, tone.HarmonicGains)
+	})
+
+	t.Run("long length", func(t *testing.T) {
+		ctx := context.NewContext()
+		require.Equal(t, 20, NumHarmGains(ctx))
+
+		gains := make([]float32, 30)
+		for i := range gains {
+			gains[i] = float32(i + 1)
+		}
+		tone := NewToneWith(ctx, 123.456, 0.789, gains)
+
+		require.IsType(t, Tone{}, tone)
+		require.Equal(t, float32(123.456), tone.Frequency)
+		require.Equal(t, float32(0.789), tone.Gain)
+		require.Equal(t, []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}, tone.HarmonicGains)
+
+		// We needed to shorten the slice of harmonic gains provided, but the backing array should
+		// not have changed.
+		for i := range gains {
+			gains[i] += 100
+		}
+		require.Equal(t, []float32{101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120}, tone.HarmonicGains)
+	})
+
+	for _, frequency := range []float32{0, -10, 10, 23.1, 440} {
+		for _, gain := range []float32{0, 0.789, 1} {
+			for _, numHarmGains := range []int{1, DefaultNumHarmGains, 100} {
+				SetNumHarmGains(numHarmGains)
+
+				ctx := context.NewContext()
+
+				gains := make([]float32, numHarmGains)
+				for i := range gains {
+					gains[i] = float32(i + 1)
+				}
+				tone := NewToneWith(ctx, frequency, gain, gains)
+
+				require.IsType(t, Tone{}, tone)
+				require.Equal(t, frequency, tone.Frequency)
+				require.Equal(t, gain, tone.Gain)
+				require.Len(t, tone.HarmonicGains, numHarmGains)
+			}
+		}
+	}
+}
+
 // Test_Tone_HarmonicFreq tests that Tone's HarmonicFreq method returns the correct frequency for a
 // variety of tones and harmonics.
 func Test_Tone_HarmonicFreq(t *testing.T) {
