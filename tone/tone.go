@@ -1,6 +1,8 @@
 package tone
 
 import (
+	"slices"
+
 	"github.com/govalues/decimal"
 	"github.com/green-aloe/enobox/context"
 	"github.com/green-aloe/enobox/note"
@@ -51,6 +53,25 @@ func NewToneAt(ctx context.Context, frequency float32) Tone {
 // NewToneFrom initializes a tone from the specified note and octave.
 func NewToneFrom(ctx context.Context, note note.Note, octave int) Tone {
 	return NewToneAt(ctx, note.Frequency(octave))
+}
+
+// NewToneWith initializes a tone with the specified fundamental frequency, gain, and harmonic
+// gains. The harmonic gains are set directly in the tone, as opposed to allocating a new slice and
+// copying over the values. If the number of harmonic gains provided does not match the number for
+// the context, this grows or shrinks the slice to match the expected length.
+func NewToneWith(ctx context.Context, frequency float32, gain float32, harmonicGains []float32) Tone {
+	if wantNumHarmGains, haveNumHarmGains := NumHarmGains(ctx), len(harmonicGains); wantNumHarmGains != haveNumHarmGains {
+		if wantNumHarmGains > haveNumHarmGains && wantNumHarmGains > cap(harmonicGains) {
+			harmonicGains = slices.Grow(harmonicGains, wantNumHarmGains)
+		}
+		harmonicGains = harmonicGains[:wantNumHarmGains]
+	}
+
+	return Tone{
+		Frequency:     frequency,
+		Gain:          gain,
+		HarmonicGains: harmonicGains,
+	}
 }
 
 // HarmonicFreq calculates the frequency of one of the tone's harmonic. The fundamental frequency
