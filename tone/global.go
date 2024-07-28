@@ -16,12 +16,13 @@ var (
 	// Number of harmonic gains above the fundamental frequency
 	numHarmGains      = DefaultNumHarmGains
 	numHarmGainsMutex sync.RWMutex
-	numHarmGainsKey   ctxKey
+	numHarmGainsKey   numHarmGainsCtxKey
 )
 
-type ctxKey struct{}
+type numHarmGainsCtxKey struct{}
 
 func init() {
+	// Add a context decorator that sets the number of harmonic gains in a tone in each new context.
 	context.AddDecorator(func(ctx context.Context) context.Context {
 		numHarmGainsMutex.RLock()
 		defer numHarmGainsMutex.RUnlock()
