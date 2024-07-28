@@ -80,7 +80,7 @@ func Test_NewContext(t *testing.T) {
 		require.True(t, rt.Implements(ri))
 	})
 
-	t.Run("initial values", func(t *testing.T) {
+	t.Run("default values", func(t *testing.T) {
 		ctx := NewContext()
 		require.Equal(t, NewTime(), ctx.Time())
 		require.Equal(t, DefaultSampleRate, ctx.SampleRate())
@@ -259,7 +259,7 @@ func Test_NewTestContext(t *testing.T) {
 
 // Test_Context_WithValue tests that Context's WithValue method sets the correct value in the context.
 func Test_Context_WithValue(t *testing.T) {
-	t.Run("nil pointer", func(t *testing.T) {
+	t.Run("nil context", func(t *testing.T) {
 		var ctx *context
 		require.NotPanics(t, func() { ctx.WithValue("key", "value") })
 	})
@@ -305,7 +305,7 @@ func Test_Context_WithValue(t *testing.T) {
 
 // Test_Context_Time tests that Context's Time method returns the correct timestamp.
 func Test_Context_Time(t *testing.T) {
-	t.Run("nil pointer", func(t *testing.T) {
+	t.Run("nil context", func(t *testing.T) {
 		var ctx *context
 		require.Zero(t, ctx.Time())
 	})
@@ -344,7 +344,7 @@ func Test_Context_Time(t *testing.T) {
 // Test_Context_SetTime tests that Context's SetTime method sets the correct timestamp in the
 // context.
 func Test_Context_SetTime(t *testing.T) {
-	t.Run("nil pointer", func(t *testing.T) {
+	t.Run("nil context", func(t *testing.T) {
 		var ctx *context
 		ctx.SetTime(NewTimeAt(10, 20, 44_100))
 		require.Zero(t, ctx.Time())
@@ -381,7 +381,7 @@ func Test_Context_SampleRate(t *testing.T) {
 	require.Equal(t, 44_100, SampleRate())
 	defer SetSampleRate(DefaultSampleRate)
 
-	t.Run("nil pointer", func(t *testing.T) {
+	t.Run("nil context", func(t *testing.T) {
 		var ctx *context
 		require.Zero(t, ctx.SampleRate())
 	})
@@ -417,7 +417,7 @@ func Test_Context_NyqistFrequency(t *testing.T) {
 	require.Equal(t, 44_100, SampleRate())
 	defer SetSampleRate(DefaultSampleRate)
 
-	t.Run("nil pointer", func(t *testing.T) {
+	t.Run("nil context", func(t *testing.T) {
 		var ctx *context
 		require.Zero(t, ctx.NyqistFrequency())
 	})
@@ -438,7 +438,7 @@ func Test_Context_NyqistFrequency(t *testing.T) {
 func Test_Context_Value(t *testing.T) {
 	var testKey ctxKey
 
-	t.Run("nil pointer", func(t *testing.T) {
+	t.Run("nil context", func(t *testing.T) {
 		var ctx *context
 		require.Panics(t, func() { ctx.Value(testKey) })
 	})
