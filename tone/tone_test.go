@@ -13,7 +13,7 @@ import (
 func Test_NewTone(t *testing.T) {
 	defer SetNumHarmGains(DefaultNumHarmGains)
 
-	for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+	for _, numHarmGains := range []int{0, 1, 100, DefaultNumHarmGains} {
 		SetNumHarmGains(numHarmGains)
 
 		ctx := context.NewContext()
@@ -50,7 +50,7 @@ func Test_NewToneAt(t *testing.T) {
 
 	for _, subtest := range subtests {
 		t.Run(subtest.name, func(t *testing.T) {
-			for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+			for _, numHarmGains := range []int{0, 1, 100, DefaultNumHarmGains} {
 				SetNumHarmGains(numHarmGains)
 
 				ctx := context.NewContext()
@@ -101,7 +101,7 @@ func Test_NewToneFrom(t *testing.T) {
 	} {
 		for octave := -1; octave <= 10; octave++ {
 			t.Run(fmt.Sprintf("%v%v", note, octave), func(t *testing.T) {
-				for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+				for _, numHarmGains := range []int{0, 1, 100, DefaultNumHarmGains} {
 					SetNumHarmGains(numHarmGains)
 
 					ctx := context.NewContext()
@@ -235,7 +235,7 @@ func Test_NewToneWith(t *testing.T) {
 
 	for _, frequency := range []float32{0, -10, 10, 23.1, 440} {
 		for _, gain := range []float32{0, 0.789, 1} {
-			for _, numHarmGains := range []int{1, DefaultNumHarmGains, 100} {
+			for _, numHarmGains := range []int{0, 1, DefaultNumHarmGains, 100} {
 				SetNumHarmGains(numHarmGains)
 
 				ctx := context.NewContext()
@@ -456,7 +456,7 @@ func Test_Tone_Reset(t *testing.T) {
 		require.Len(t, tone.HarmonicGains, 0)
 	})
 
-	for _, numHarmGains := range []int{1, DefaultNumHarmGains, 100} {
+	for _, numHarmGains := range []int{0, 1, DefaultNumHarmGains, 100} {
 		SetNumHarmGains(numHarmGains)
 
 		ctx := context.NewContext()

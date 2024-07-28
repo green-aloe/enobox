@@ -46,7 +46,7 @@ func Test_NewSquareTone(t *testing.T) {
 
 	for _, subtest := range subtests {
 		t.Run(subtest.name, func(t *testing.T) {
-			for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+			for _, numHarmGains := range []int{0, 1, 100, DefaultNumHarmGains} {
 				SetNumHarmGains(numHarmGains)
 
 				ctx := context.NewContext()
@@ -110,7 +110,7 @@ func Test_NewTriangleTone(t *testing.T) {
 
 	for _, subtest := range subtests {
 		t.Run(subtest.name, func(t *testing.T) {
-			for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+			for _, numHarmGains := range []int{0, 1, 100, DefaultNumHarmGains} {
 				SetNumHarmGains(numHarmGains)
 
 				ctx := context.NewContext()
@@ -174,7 +174,7 @@ func Test_NewSawtoothTone(t *testing.T) {
 
 	for _, subtest := range subtests {
 		t.Run(subtest.name, func(t *testing.T) {
-			for _, numHarmGains := range []int{1, 100, DefaultNumHarmGains} {
+			for _, numHarmGains := range []int{0, 1, 100, DefaultNumHarmGains} {
 				SetNumHarmGains(numHarmGains)
 
 				ctx := context.NewContext()

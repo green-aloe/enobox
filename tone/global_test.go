@@ -76,11 +76,11 @@ func Test_NumHarmGains(t *testing.T) {
 
 // Test_SetNumHarmGains tests that SetNumHarmGains sets the global number of harmonic gains in a tone.
 func Test_SetNumHarmGains(t *testing.T) {
-	t.Run("invalid values", func(t *testing.T) {
-		defer SetNumHarmGains(DefaultNumHarmGains)
+	defer SetNumHarmGains(DefaultNumHarmGains)
 
-		for _, n := range []int{0, -1, -20} {
-			SetNumHarmGains(n)
+	t.Run("invalid values", func(t *testing.T) {
+		for n := range 1_000 {
+			SetNumHarmGains(0 - n - 1)
 
 			require.Equal(t, DefaultNumHarmGains, numHarmGains)
 
@@ -90,15 +90,13 @@ func Test_SetNumHarmGains(t *testing.T) {
 	})
 
 	t.Run("valid values", func(t *testing.T) {
-		defer SetNumHarmGains(DefaultNumHarmGains)
-
 		for n := range 1_000 {
-			SetNumHarmGains(n + 1)
+			SetNumHarmGains(n)
 
-			require.Equal(t, n+1, numHarmGains)
+			require.Equal(t, n, numHarmGains)
 
 			ctx := context.NewContext()
-			require.Equal(t, n+1, NumHarmGains(ctx))
+			require.Equal(t, n, NumHarmGains(ctx))
 		}
 	})
 }
@@ -119,7 +117,7 @@ func Test_NumHarmGains_Concurrency(t *testing.T) {
 				ctx := context.NewContext()
 				NumHarmGains(ctx)
 			} else {
-				SetNumHarmGains(i + 1)
+				SetNumHarmGains(i)
 			}
 		}()
 	}

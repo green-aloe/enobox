@@ -51,7 +51,7 @@ func SetNumHarmGains(rate int) {
 	numHarmGainsMutex.Lock()
 	defer numHarmGainsMutex.Unlock()
 
-	if rate > 0 {
+	if rate >= 0 {
 		numHarmGains = rate
 	}
 }
