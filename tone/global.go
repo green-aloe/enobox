@@ -45,8 +45,8 @@ func NumHarmGains(ctx context.Context) int {
 	return 0
 }
 
-// SetNumHarmGains sets the global sample rate (number of samples per second (Hz) in the output).
-// The rate must be greater than zero.
+// SetNumHarmGains sets the global number of harmonic gains in a tone. All contexts created after
+// this is called will use the value set here. The rate cannot be a negative numbers.
 func SetNumHarmGains(rate int) {
 	numHarmGainsMutex.Lock()
 	defer numHarmGainsMutex.Unlock()
