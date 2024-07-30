@@ -27,10 +27,12 @@ type bufferPoolCtxKey struct{}
 
 func init() {
 	// Add a context decorator that sets a buffer pool in each new context depending on the sample
-	// rate and number of harmonic gains in a tone configured for the context. (The decorator for
-	// setting the number of harmonic gains is guaranteed to be added to the pipeline before this
-	// one because this one calls the package for the other one, which means that package will
-	// finish its initialization first.)
+	// rate and number of harmonic gains in a tone configured for the context.
+	//
+	// We need to add this decorator after the decorator that sets the number of harmonic gains,
+	// since this one uses the other one. This loose ordering is guaranteed because this decorator
+	// calls the package for the other decorator, which means that package will finish its
+	// initialization first and add its decorator the context builder before returning back here.
 	context.AddDecorator(func(ctx context.Context) context.Context {
 		bufferPoolsMutex.Lock()
 		defer bufferPoolsMutex.Unlock()
