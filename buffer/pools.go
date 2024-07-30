@@ -10,9 +10,9 @@ import (
 
 var (
 	// We must use a custom pool implementation instead of the more standard sync.Pool because the
-	// latter can drop buffers at any time, which isn't good for us because we might need to close
-	// the buffer before releasing it (so that non-go garbage collectors can also release their
-	// references to the memory).
+	// latter can drop buffers at any time. That wouldn't be good for us because we might need to
+	// close the buffer before releasing it (so that non-go garbage collectors can also release
+	// their references to the memory).
 	bufferPools      = make(map[bufferPoolsKey]*pool.Pool[Buffer])
 	bufferPoolsMutex sync.Mutex
 	bufferPoolKey    bufferPoolCtxKey
@@ -55,6 +55,7 @@ func init() {
 	})
 }
 
+// BufferPool returns the buffer pool for this context, or nil if no pool is set.
 func BufferPool(ctx context.Context) *pool.Pool[Buffer] {
 	if v := ctx.Value(bufferPoolKey); v != nil {
 		if p, ok := v.(*pool.Pool[Buffer]); ok {
