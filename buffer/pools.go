@@ -45,7 +45,8 @@ func init() {
 		bufferPool, ok := bufferPools[key]
 		if !ok || bufferPool == nil {
 			bufferPool = &pool.Pool[Buffer]{
-				NewItem: func() Buffer { return NewBuffer(ctx) },
+				NewItem:  func() Buffer { return NewBuffer(ctx) },
+				PreStore: func(buffer Buffer) Buffer { buffer.Reset(); return buffer },
 			}
 			bufferPools[key] = bufferPool
 		}
