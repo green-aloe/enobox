@@ -15,6 +15,8 @@ github.com/green-aloe/metal v0.3.0 h1:rcGUiwrD+vzmGAWk0pTyVpK4ry6/T4gj15zWjR11X1
 github.com/green-aloe/metal v0.3.0/go.mod h1:emPLjj+hkoma2xepHNEFUqnBONyqFcyULbPlc1MjbVE=
 github.com/green-aloe/utilities v0.2.1 h1:p2ru8qmkFFOfUw8YfV5Pl9Zae8ms8bJQ+twZNAuPiPI=
 github.com/green-aloe/utilities v0.2.1/go.mod h1:P1qVwiG4VEodDmAP5WPWbysXqQmo/yNLSmux1z5tg4Q=
+github.com/green-aloe/utilities v0.3.0 h1:GnDXtugM3nf1bjc+Ctmdvb4/MWsjd+f/lhjIaf0BGYI=
+github.com/green-aloe/utilities v0.3.0/go.mod h1:P1qVwiG4VEodDmAP5WPWbysXqQmo/yNLSmux1z5tg4Q=
 github.com/hajimehoshi/go-mp3 v0.3.0/go.mod h1:qMJj/CSDxx6CGHiZeCgbiq2DSUkbK0UbtXShQcnfyMM=
 github.com/hajimehoshi/oto v0.6.1/go.mod h1:0QXGEkbuJRohbJaxr7ZQSxnju7hEhseiPx2hrh6raOI=
 github.com/hajimehoshi/oto v0.7.1 h1:I7maFPz5MBCwiutOrz++DLdbr4rTzBsbBuV2VpgU9kk=
