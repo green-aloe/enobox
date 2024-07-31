@@ -137,6 +137,7 @@ func Test_NewToneWith(t *testing.T) {
 		require.Equal(t, float32(123.456), tone.Frequency)
 		require.Equal(t, float32(0.789), tone.Gain)
 		require.Equal(t, []float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, tone.HarmonicGains)
+		require.Equal(t, 20, cap(tone.HarmonicGains))
 	})
 
 	t.Run("short length, short capacity", func(t *testing.T) {
@@ -153,6 +154,7 @@ func Test_NewToneWith(t *testing.T) {
 		require.Equal(t, float32(123.456), tone.Frequency)
 		require.Equal(t, float32(0.789), tone.Gain)
 		require.Equal(t, []float32{1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, tone.HarmonicGains)
+		require.Equal(t, 20, cap(tone.HarmonicGains))
 
 		// We needed more harmonic gains than were provided. The provided slice was too short, and
 		// it did not have enough capacity to grow in place. We should have allocated a new slice
@@ -177,6 +179,7 @@ func Test_NewToneWith(t *testing.T) {
 		require.Equal(t, float32(123.456), tone.Frequency)
 		require.Equal(t, float32(0.789), tone.Gain)
 		require.Equal(t, []float32{1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, tone.HarmonicGains)
+		require.Equal(t, 30, cap(tone.HarmonicGains))
 
 		// We needed more harmonic gains than were provided. The provided slice was too short, but
 		// it had enough capacity to grow in place. We should not have allocated a new slice and
@@ -201,6 +204,7 @@ func Test_NewToneWith(t *testing.T) {
 		require.Equal(t, float32(123.456), tone.Frequency)
 		require.Equal(t, float32(0.789), tone.Gain)
 		require.Equal(t, []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}, tone.HarmonicGains)
+		require.Equal(t, 20, cap(tone.HarmonicGains))
 
 		// We did not need to change anything about the slice of harmonic gains provided. We should
 		// still be using the same backing array.
@@ -224,6 +228,7 @@ func Test_NewToneWith(t *testing.T) {
 		require.Equal(t, float32(123.456), tone.Frequency)
 		require.Equal(t, float32(0.789), tone.Gain)
 		require.Equal(t, []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}, tone.HarmonicGains)
+		require.Equal(t, 30, cap(tone.HarmonicGains))
 
 		// We needed to shorten the slice of harmonic gains provided, but the backing array should
 		// not have changed.

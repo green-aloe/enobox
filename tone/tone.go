@@ -60,11 +60,11 @@ func NewToneFrom(ctx context.Context, note note.Note, octave int) Tone {
 // copying over the values. If the number of harmonic gains provided does not match the number for
 // the context, this grows or shrinks the slice to match the expected length.
 func NewToneWith(ctx context.Context, frequency float32, gain float32, harmonicGains []float32) Tone {
-	if wantNumHarmGains, haveNumHarmGains := NumHarmGains(ctx), len(harmonicGains); wantNumHarmGains != haveNumHarmGains {
-		if wantNumHarmGains > haveNumHarmGains && wantNumHarmGains > cap(harmonicGains) {
-			harmonicGains = slices.Grow(harmonicGains, wantNumHarmGains)
+	if want, have := NumHarmGains(ctx), len(harmonicGains); want != have {
+		if want > cap(harmonicGains) {
+			harmonicGains = slices.Grow(harmonicGains, want-have)
 		}
-		harmonicGains = harmonicGains[:wantNumHarmGains]
+		harmonicGains = harmonicGains[:want]
 	}
 
 	return Tone{
