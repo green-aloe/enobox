@@ -26,6 +26,7 @@ func ExampleAddDecorator() {
 
 func ExampleNewContext() {
 	ctx := context.NewContext()
+
 	time := ctx.Time()
 	sampleRate := ctx.SampleRate()
 
@@ -39,6 +40,7 @@ func ExampleNewContext() {
 
 func ExampleNewContextWith() {
 	ctx := context.NewContextWith(context.ContextOptions{})
+
 	time := ctx.Time()
 	sampleRate := ctx.SampleRate()
 	value := ctx.Value("key")
@@ -57,6 +59,7 @@ func ExampleNewContextWith() {
 			},
 		},
 	})
+
 	time = ctx.Time()
 	sampleRate = ctx.SampleRate()
 	value = ctx.Value("key")
@@ -76,6 +79,7 @@ func ExampleNewContextWith() {
 
 func ExampleNewTestContext() {
 	ctx := context.NewTestContext()
+
 	time := ctx.Time()
 	sampleRate := ctx.SampleRate()
 
@@ -89,6 +93,7 @@ func ExampleNewTestContext() {
 
 func ExampleContext_WithValue() {
 	ctx := context.NewContext()
+
 	value := ctx.Value("key")
 
 	fmt.Println(value)
@@ -105,6 +110,7 @@ func ExampleContext_WithValue() {
 
 func ExampleContext_Time() {
 	ctx := context.NewContext()
+
 	time := ctx.Time()
 
 	fmt.Println(time)
@@ -115,6 +121,7 @@ func ExampleContext_Time() {
 
 func ExampleContext_SetTime() {
 	ctx := context.NewContext()
+
 	time1 := ctx.Time()
 
 	time2 := time1.Increment()
@@ -133,6 +140,7 @@ func ExampleContext_SetTime() {
 
 func ExampleContext_SampleRate() {
 	ctx := context.NewContext()
+
 	sampleRate := ctx.SampleRate()
 
 	fmt.Println(sampleRate)
@@ -143,6 +151,7 @@ func ExampleContext_SampleRate() {
 
 func ExampleContext_NyqistFrequency() {
 	ctx := context.NewContext()
+
 	nyquistFreq := ctx.NyqistFrequency()
 
 	fmt.Println(nyquistFreq)
