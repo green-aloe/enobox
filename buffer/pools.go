@@ -57,6 +57,10 @@ func init() {
 
 // BufferPool returns the buffer pool for this context, or nil if no pool is set.
 func BufferPool(ctx context.Context) *pool.Pool[Buffer] {
+	if ctx == nil {
+		return nil
+	}
+
 	if v := ctx.Value(bufferPoolKey); v != nil {
 		if p, ok := v.(*pool.Pool[Buffer]); ok {
 			return p
