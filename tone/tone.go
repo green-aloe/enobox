@@ -44,10 +44,7 @@ func NewTone(ctx context.Context) Tone {
 
 // NewToneAt initializes a tone with the specified fundamental frequency.
 func NewToneAt(ctx context.Context, frequency float32) Tone {
-	return Tone{
-		Frequency:     frequency,
-		HarmonicGains: make([]float32, NumHarmGains(ctx)),
-	}
+	return NewToneWith(ctx, frequency, 0, make([]float32, NumHarmGains(ctx)))
 }
 
 // NewToneFrom initializes a tone from the specified note and octave.
